@@ -1,22 +1,26 @@
 version: "3.8"
 services:
-  bluemark:
+  app:
     build:
       context: ../
-      dockerfile: .devcontainer/bluemark
-    image: bluemark_image
+      dockerfile: .devcontainer/Dockerfile
+    image: app_image
     stdin_open: true
     tty: true
-    container_name: bluemark_container
+    container_name: app_container
     restart: always
     ports:
       - "8080:8080"
+      - "8888:8888"
     depends_on:
       - "db"
     volumes:
       - type: volume
-        source: bluemark_volume
-        target: /home/developer/bluemark
+        source: app_volume
+        target: /home/developer/app
+    environment:
+      BACKEND_PORT: 8080
+      FRONTEND_PORT: 8888
   db:
     image: postgres
     container_name: db_container
@@ -27,4 +31,4 @@ services:
       POSTGRES_PASSWORD: bluemark
 
 volumes:
-  bluemark_volume:
+  app_volume:
