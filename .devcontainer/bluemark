@@ -1,0 +1,13 @@
+FROM node:14.15.1
+
+# Setup new user
+RUN useradd -ms /bin/bash developer
+USER developer
+WORKDIR /home/developer
+RUN mkdir bluemark
+
+COPY --chown=developer:developer . ./bluemark
+
+WORKDIR /home/developer/bluemark
+
+RUN npm install
