@@ -1,8 +1,8 @@
 {
 	"name": "Bluemark",
 	"dockerComposeFile": "docker-compose.yml",
-	"service": "backend",
-	"workspaceFolder": "/home/developer/backend",
+	"service": "app",
+	"workspaceFolder": "/home/developer/app",
 
 	// Use this environment variable if you need to bind mount your local source code into a new container.
 	"remoteEnv": {
