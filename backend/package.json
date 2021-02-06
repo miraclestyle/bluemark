@@ -4,6 +4,8 @@
   "description": "Bluemark Product Tracker Backend Server",
   "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
+    "start-dev": "nodemon server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
