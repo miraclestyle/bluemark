@@ -17,8 +17,8 @@ router.use((req, res, next) => {
   next();
 });
 
-router.use('/api/products', products);
-router.use('/api/locations', locations);
-router.use('/api/movements', movements);
+router.use(products);
+router.use(locations);
+router.use(movements);
 
 module.exports = router;
