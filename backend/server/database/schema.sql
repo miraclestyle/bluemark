@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS locations;
 CREATE TABLE locations (
   location_id SERIAL NOT NULL PRIMARY KEY,
   location_parent_id INTEGER REFERENCES locations (location_id),
-  location_path LTREE,
+  location_path LTREE UNIQUE,
   location_name VARCHAR(256) NOT NULL,
   location_description TEXT
 );
@@ -68,25 +68,21 @@ DROP TABLE IF EXISTS product_movement_entries;
 CREATE TABLE product_movement_entries (
   product_movement_entry_id SERIAL NOT NULL PRIMARY KEY,
   product_movement_id INTEGER NOT NULL REFERENCES product_movements (product_movement_id),
-  location_id INTEGER NOT NULL REFERENCES locations (location_id),
-  location_path LTREE NOT NULL,
+  location_path LTREE NOT NULL REFERENCES locations (location_path),
   quantity_out NUMERIC NOT NULL DEFAULT 0,
   quantity_in NUMERIC NOT NULL DEFAULT 0
 );
 
 CREATE INDEX product_movement_entry_product_movement_ids ON product_movement_entries  (product_movement_id);
-CREATE INDEX product_movement_entry_location_ids ON product_movement_entries  (location_id);
 CREATE INDEX product_movement_entry_location_paths ON product_movement_entries USING GIST (location_path);
 
 
-DROP VIEW IF EXISTS product_locations;
+DROP VIEW IF EXISTS product_location_inventory;
 
-CREATE VIEW product_locations AS SELECT
-l.location_path AS location_path,
+CREATE VIEW product_location_inventory AS SELECT
 pm.product_id AS product_id,
+pme.location_path AS location_path,
 (CASE WHEN pme.quantity_out IS NULL THEN 0 ELSE pme.quantity_out END) AS quantity_out,
 (CASE WHEN pme.quantity_in IS NULL THEN 0 ELSE pme.quantity_in END) AS quantity_in
-FROM locations AS l LEFT OUTER JOIN product_movement_entries AS pme
-ON (l.location_path = pme.location_path)
-LEFT OUTER JOIN product_movements AS pm
-ON (pme.product_movement_id = pm.product_movement_id);
+FROM product_movements AS pm INNER JOIN product_movement_entries AS pme
+ON (pm.product_movement_id = pme.product_movement_id);
