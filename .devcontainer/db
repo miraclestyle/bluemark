@@ -1,0 +1,11 @@
+FROM postgres:13.1
+
+# Setup new user
+RUN useradd -ms /bin/bash developer
+USER developer
+WORKDIR /home/developer
+RUN mkdir database
+
+COPY --chown=developer:developer ./backend/server/database/schema.sql ./database
+
+WORKDIR /home/developer/database

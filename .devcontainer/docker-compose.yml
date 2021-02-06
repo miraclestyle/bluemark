@@ -5,10 +5,10 @@ services:
       context: ../
       dockerfile: .devcontainer/Dockerfile
     image: app_image
-    stdin_open: true
-    tty: true
     container_name: app_container
     restart: always
+    stdin_open: true
+    tty: true
     ports:
       - "8080:8080"
       - "8888:8888"
@@ -22,12 +22,18 @@ services:
       BACKEND_PORT: 8080
       FRONTEND_PORT: 8888
   db:
-    image: postgres
+    build:
+      context: ../
+      dockerfile: .devcontainer/db
+    image: db_image
     container_name: db_container
     restart: always
+    stdin_open: true
+    tty: true
     ports:
       - "5432:5432"
     environment:
+      POSTGRES_DB: bluemark
       POSTGRES_PASSWORD: bluemark
 
 volumes:
