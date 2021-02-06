@@ -1,3 +1,5 @@
-const db = require('./client');
+const products = require('./products');
 
-module.exports = {};
+module.exports = {
+  ...products,
+ };

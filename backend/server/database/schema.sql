@@ -14,6 +14,8 @@ CREATE TABLE products (
   product_description TEXT
 );
 
+CREATE INDEX product_names ON products (product_name);
+
 
 DROP TABLE IF EXISTS locations;
 
