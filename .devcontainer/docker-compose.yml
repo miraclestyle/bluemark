@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: ../
-      dockerfile: .devcontainer/Dockerfile
+      dockerfile: .devcontainer/app
     image: app_image
     container_name: app_container
     restart: always
