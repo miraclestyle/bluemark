@@ -4,8 +4,8 @@ FROM postgres:13.1
 RUN useradd -ms /bin/bash developer
 USER developer
 WORKDIR /home/developer
-RUN mkdir database
+RUN mkdir db
 
-COPY --chown=developer:developer ./backend/server/database/schema.sql ./database
+COPY --chown=developer:developer ./backend/server/database/schema.sql ./db
 
-WORKDIR /home/developer/database
+WORKDIR /home/developer/db
