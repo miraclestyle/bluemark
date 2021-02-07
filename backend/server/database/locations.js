@@ -1,17 +1,33 @@
 const db = require('./client');
 
-const getLocations = (parent_id = null) => {
+const getRootLocations = () => {
+  const query = `SELECT location_id AS id, location_parent_id AS parent_id,
+    location_path AS path, location_name AS name,
+    location_description AS description
+    FROM locations WHERE location_parent_id IS NULL`;
+  const q = {
+    name: 'select-root-locations',
+    text: query,
+  };
+  return db.query(q);
+};
+
+const getChildLocations = (parent_id) => {
   const query = `SELECT location_id AS id, location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description
     FROM locations WHERE location_parent_id = $1`;
   const q = {
-    name: 'select-locations',
+    name: 'select-child-locations',
     text: query,
     values: [parent_id],
   };
   return db.query(q);
 };
+
+const getLocations = (parent_id = null) => (
+  parent_id === null ? getRootLocations() : getChildLocations(parent_id)
+  );
 
 const getLocation = (id) => {
   const query = `SELECT location_id AS id, location_parent_id AS parent_id,
