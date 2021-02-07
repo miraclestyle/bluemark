@@ -45,7 +45,11 @@ const getLocation = (id) => {
 const insertLocation = (name, parent_id, description) => {
   const query = `INSERT INTO locations
     (location_name, location_parent_id, location_description)
-    VALUES ($1, $2, $3)`;
+    VALUES ($1, $2, $3)
+    RETURNING location_id AS id,
+    location_parent_id AS parent_id,
+    location_path AS path, location_name AS name,
+    location_description AS description`;
   const q = {
     name: 'insert-location',
     text: query,
@@ -56,7 +60,11 @@ const insertLocation = (name, parent_id, description) => {
 
 const updateLocation = (id, name, description) => {
   const query = `UPDATE locations SET location_name = $2, location_description = $3
-    WHERE location_id = $1`;
+    WHERE location_id = $1
+    RETURNING location_id AS id,
+    location_parent_id AS parent_id,
+    location_path AS path, location_name AS name,
+    location_description AS description`;
   const q = {
     name: 'update-location',
     text: query,

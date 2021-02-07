@@ -26,7 +26,9 @@ const getProduct = (id) => {
 
 const insertProduct = (name, description) => {
   const query = `INSERT INTO products (product_name, product_description)
-    VALUES ($1, $2)`;
+    VALUES ($1, $2)
+    RETURNING product_id AS id, product_name AS name,
+    product_description AS description`;
   const q = {
     name: 'insert-product',
     text: query,
@@ -37,7 +39,9 @@ const insertProduct = (name, description) => {
 
 const updateProduct = (id, name, description) => {
   const query = `UPDATE products SET product_name = $2, product_description = $3
-    WHERE product_id = $1`;
+    WHERE product_id = $1
+    RETURNING product_id AS id, product_name AS name,
+    product_description AS description`;
   const q = {
     name: 'update-product',
     text: query,
