@@ -25,6 +25,7 @@ CREATE TABLE locations (
   location_description TEXT
 );
 
+CREATE INDEX location_names ON locations (location_name);
 CREATE INDEX location_parents ON locations (location_parent_id);
 CREATE INDEX location_paths ON locations USING GIST (location_path);
 
