@@ -7,7 +7,7 @@ const requestHandler = (query, argsFormater) => {
   return (req, res) => {
     query(...argsFormater(req))
       .then((data) => {
-        // console.log(`${query.name} data:`, data);
+        console.log(`${query.name} data:`, data);
         res.status(200).json(data);
       })
       .catch((error) => {
@@ -19,7 +19,7 @@ const requestHandler = (query, argsFormater) => {
 
 const getProducts = (req) => ([req.query.limit || 10, req.query.offset || 0]);
 const getProduct = (req) => ([req.params.id]);
-const insertProduct = (req) => ([req.params.id, req.body.name, req.body.description]);
+const insertProduct = (req) => ([req.body.name, req.body.description]);
 const updateProduct = (req) => ([req.params.id, req.body.name, req.body.description]);
 
 router.get('/api/products', requestHandler(db.getProducts, getProducts));
