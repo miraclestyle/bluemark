@@ -2,7 +2,7 @@ const db = require('./client');
 
 const getMovements = (product_id, location_path) => {
   const query = `SELECT product_id, location_path, quantity_in, quantity_out
-    FROM product_location_inventory WHERE product_id = $1 AND location_path = $2`;
+    FROM product_location_inventory WHERE product_id = $1 AND location_path <@ $2`;
   const q = {
     name: 'select-movements',
     text: query,
