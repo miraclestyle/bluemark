@@ -17,7 +17,7 @@ const requestHandler = (query, argsFormater) => {
   };
 };
 
-const getProducts = (req) => ([req.query.limit || 10, req.query.offset || 0]);
+const getProducts = (req) => ([req.query.limit, req.query.offset]);
 const getProduct = (req) => ([req.params.id]);
 const insertProduct = (req) => ([req.body.name, req.body.description]);
 const updateProduct = (req) => ([req.params.id, req.body.name, req.body.description]);

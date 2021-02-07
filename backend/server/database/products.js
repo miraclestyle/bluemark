@@ -1,6 +1,6 @@
 const db = require('./client');
 
-const getProducts = (limit, offset) => {
+const getProducts = (limit = 10, offset = 0) => {
   const query = `SELECT product_id AS id, product_name AS name,
     product_description AS description
     FROM products ORDER BY product_name LIMIT $1 OFFSET $2`;
