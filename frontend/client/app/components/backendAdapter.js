@@ -35,7 +35,8 @@ const updateProduct = (product_id, name, description, callback) => {
 };
 
 const getLocations = (parent_id, callback) => {
-  const uri = `${BACKEND_ENDPOINT}${LOCATIONS}?parent_id=${parent_id}`;
+  let uri = `${BACKEND_ENDPOINT}${LOCATIONS}`;
+  if (parent_id !== null) uri = `${uri}?parent_id=${parent_id}`;
   axios.get(uri)
     .then((response) => (callback(response.data.rows)))
     .catch((error) => (console.log('getLocations error:', error)));
