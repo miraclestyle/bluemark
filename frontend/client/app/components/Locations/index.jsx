@@ -1,20 +1,21 @@
 const React = require('react');
 const api = require('../backendAdapter');
 const LocationsList = require('./LocationsList.jsx');
+const ParentLocation = require('./ParentLocation.jsx');
 
 class Locations extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       locations: [],
-      readLocation: {
+      selectedLocation: {
         id: null,
         parent_id: null,
         path: '',
         name: '',
         description: '',
       },
-      writeLocation: {
+      updatedLocation: {
         id: null,
         parent_id: null,
         path: '',
@@ -50,45 +51,45 @@ class Locations extends React.Component {
   newLocation() {
     this.setState((state) => {
       const locations = state.locations.slice();
-      const { readLocation } = state;
+      const { selectedLocation } = state;
       const createLocation = {
         id: null,
-        parent_id: readLocation.id,
+        parent_id: selectedLocation.id,
         path: '',
         name: '',
         description: '',
       };
       locations.push(createLocation);
-      return { locations, writeLocation: createLocation };
+      return { locations, updatedLocation: createLocation };
     });
   }
 
   selectLocation(location) {
     if (location === null) {
-      const { readLocation } = this.state;
-      this.getLocations(readLocation.parent_id);
-      this.getLocation(readLocation.parent_id);
-      this.setState(() => ({ writeLocation: this.template() }));
+      const { selectedLocation } = this.state;
+      this.getLocations(selectedLocation.parent_id);
+      this.getLocation(selectedLocation.parent_id);
+      this.setState(() => ({ updatedLocation: this.template() }));
     } else {
       this.getLocations(location.id);
       this.setState(() => ({
-        readLocation: location,
-        writeLocation: this.template(),
+        selectedLocation: location,
+        updatedLocation: this.template(),
       }));
     }
   }
 
   updateLocation(location) {
-    this.setState(() => ({ writeLocation: { ...location } }));
+    this.setState(() => ({ updatedLocation: { ...location } }));
   }
 
   editLocation(event) {
     const key = event.target.name;
     const value = event.target.value;
     this.setState((state) => {
-      const newLocation = { ...state.writeLocation };
+      const newLocation = { ...state.updatedLocation };
       newLocation[key] = value;
-      return { writeLocation: newLocation };
+      return { updatedLocation: newLocation };
     });
   }
 
@@ -97,7 +98,7 @@ class Locations extends React.Component {
       const locations = state.locations.slice();
       const i = locations.findIndex((location) => (location.id === location_id));
       locations.splice(i, 1, newLocation);
-      return { locations, writeLocation: this.template() };
+      return { locations, updatedLocation: this.template() };
     });
   }
 
@@ -109,36 +110,36 @@ class Locations extends React.Component {
 
   getLocation(location_id) {
     if (location_id === null) {
-      this.setState(() => ({ readLocation: this.template() }));
+      this.setState(() => ({ selectedLocation: this.template() }));
     } else {
       api.getLocation(location_id, (records) => {
-        this.setState(() => ({ readLocation: records[0] }));
+        this.setState(() => ({ selectedLocation: records[0] }));
       });
     }
 
   }
 
   saveLocation() {
-    const { writeLocation } = this.state;
-    if (writeLocation.id !== null) {
+    const { updatedLocation } = this.state;
+    if (updatedLocation.id !== null) {
       api.updateLocation(
-        writeLocation.id,
-        writeLocation.name,
-        writeLocation.description,
-        (records) => (this.updateLocations(writeLocation.id, records[0]))
+        updatedLocation.id,
+        updatedLocation.name,
+        updatedLocation.description,
+        (records) => (this.updateLocations(updatedLocation.id, records[0]))
       );
     } else {
       api.insertLocation(
-        writeLocation.parent_id,
-        writeLocation.name,
-        writeLocation.description,
+        updatedLocation.parent_id,
+        updatedLocation.name,
+        updatedLocation.description,
         (records) => (this.updateLocations(null, records[0]))
       );
     }
   }
 
   render() {
-    const { locations, readLocation, writeLocation } = this.state;
+    const { locations, selectedLocation, updatedLocation } = this.state;
     const {
       newLocation,
       selectLocation,
@@ -151,12 +152,13 @@ class Locations extends React.Component {
       <div>
         <h3>Locations</h3>
         <button onClick={newLocation}>Add New Location</button>
-        <h4>
-          Parent Location - {readLocation.path} - {readLocation.name} - <button onClick={() => selectLocation(null)}>Up</button>
-        </h4>
+        <ParentLocation
+          location={selectedLocation}
+          selectLocation={selectLocation}
+        />
         <LocationsList
           locations={locations}
-          selected={writeLocation}
+          selected={updatedLocation}
           selectLocation={selectLocation}
           updateLocation={updateLocation}
           editLocation={editLocation}
