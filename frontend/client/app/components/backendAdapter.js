@@ -72,7 +72,7 @@ const getMovements = (product_id, location_path, callback) => {
 
 const insertMovementEntries = (product_id, entries, callback) => {
   const uri = `${BACKEND_ENDPOINT}${MOVEMENTS}`;
-  axios.get(uri)
+  axios.post(uri, { product_id, entries })
     .then((response) => (callback(response.data.rows)))
     .catch((error) => (console.log('insertMovementEntries error:', error)));
 };
