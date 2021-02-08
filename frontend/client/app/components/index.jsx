@@ -6,14 +6,30 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      menu: '',
     };
+    this.navigate = this.navigate.bind(this);
+  }
+
+  navigate(item) {
+    this.setState({ menu: item });
   }
 
   render() {
+    const { menu } = this.state;
+    const { navigate } = this;
+    let item = null;
+    if (menu === 'products') {
+      item = <Products />
+    } else if (menu === 'locations') {
+      item = <Locations />
+    }
     return (
       <div>
         <h2>Bluemark Product Movements</h2>
-        <Products />
+        <button onClick={() => navigate('products')}>Products</button>
+        <button onClick={() => navigate('locations')}>Locations</button>
+        { item }
       </div>
     );
   }
