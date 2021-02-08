@@ -1,31 +1,24 @@
 const React = require('react');
 
-const LocationSelector = ({
-  product,
-  location,
-  children,
-  editProduct,
-  updateLocation,
-}) => (
+const LocationSelector = ({index, location, updateLocation}) => (
     <select
       name="location"
-      id={product.id}
       value={location.id || null}
       onChange={(e) => {
-        updateLocation(e);
+        updateLocation(e, index);
       }}
     >
-      <option
-        key={location.parent_id}
-        value={location.parent_id}
-        product_id={product.id}
-      >PARENT</option>
-      {children.map((child) => (
-        <option
-          key={child.id}
-          value={child.id}
-          product_id={product.id}
-        >{child.path} - {child.name}</option>
+      <option key={null} value={null}>NONE</option>
+      <option key={location.parent_id} value={location.parent_id}>
+        PARENT
+      </option>
+      <option key={location.id} value={location.id}>
+        {location.path} - {location.name}
+      </option>
+      {location.children.map((child) => (
+        <option key={child.id} value={child.id}>
+          {child.path} - {child.name}
+        </option>
       ))}
     </select>
 );
