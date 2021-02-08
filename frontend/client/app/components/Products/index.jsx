@@ -30,23 +30,14 @@ class Products extends React.Component {
   }
 
   updateProduct(selectedProduct) {
-    const newProduct = {
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      description: selectedProduct.description,
-    };
-    this.setState(() => ({ product: newProduct }));
+    this.setState(() => ({ product: { ...selectedProduct } }));
   }
 
   editProduct(event) {
     const key = event.target.name;
     const value = event.target.value;
     this.setState((state) => {
-      const newProduct = {
-        id: state.product.id,
-        name: state.product.name,
-        description: state.product.description,
-      };
+      const newProduct = { ...state.product };
       newProduct[key] = value;
       return { product: newProduct };
     });
