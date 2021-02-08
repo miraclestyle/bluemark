@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.use((req, res, next) => {
-  console.log(req.method, req.path, req.params, req.body);
+  console.log(req.method, req.path, req.params, req.query, req.body);
   next();
 });
 
