@@ -1,5 +1,5 @@
 const React = require('react');
-const api = require('./backendAdapter');
+const api = require('../backendAdapter');
 const LocationsList = require('./LocationsList.jsx');
 
 class Locations extends React.Component {

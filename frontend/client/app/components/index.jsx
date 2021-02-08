@@ -1,7 +1,6 @@
 const React = require('react');
-const api = require('./backendAdapter');
-const Products = require('./Products.jsx');
-const Locations = require('./Locations.jsx');
+const Products = require('./Products/index.jsx');
+const Locations = require('./Locations/index.jsx');
 
 class App extends React.Component {
   constructor(props) {
@@ -14,7 +13,7 @@ class App extends React.Component {
     return (
       <div>
         <h2>Bluemark Product Movements</h2>
-        <Locations />
+        <Products />
       </div>
     );
   }
