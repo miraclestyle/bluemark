@@ -1,5 +1,5 @@
 const React = require('react');
-const axios = require('axios');
+const api = require('./backendAdapter');
 const ProductsList = require('./ProductsList.jsx');
 const { BACKEND_ENDPOINT, PRODUCTS } = require('../../config');
 
@@ -8,8 +8,9 @@ class App extends React.Component {
     super(props);
     this.state = {
       products: [],
+      locations: [],
     };
-    this.updateProducts = this.updateProducts.bind(this);
+    this.stateProducts = this.stateProducts.bind(this);
   }
 
   componentDidMount() {
@@ -17,19 +18,48 @@ class App extends React.Component {
   }
 
   getProducts(limit = 1000, offset = 0) {
-    const uri = `${BACKEND_ENDPOINT}${PRODUCTS}?limit=${limit}&offset=${offset}`;
-    axios(uri)
-      .then((response) => this.updateProducts(response.data))
-      .catch((error) => (console.log('getProducts error:', error)));
+    api.getProducts(limit, offset, (records) => {
+      this.setState(() => ({ products: records }));
+    });
   }
 
-  updateProducts(data) {
-    console.log(data.rows);
-    const newProducts = data.rows.map((product) => {
-      const id = product.id;
-      const url = `${BACKEND_ENDPOINT}${PRODUCTS}/${id}`;
-      return { ...product, url };
-    });
+  getProduct(product_id) {
+    api.getProduct(product_id);
+  }
+
+  insertProduct(name, description) {
+    api.insertProduct(name, description);
+  }
+
+  updateProduct(product_id, name, description) {
+    api.updateProduct(product_id, name, description);
+  }
+
+  getLocations(parent_id = null) {
+    api.getLocations(parent_id);
+  }
+
+  getLocation(location_id) {
+    api.getLocation(location_id);
+  }
+
+  insertLocation(parent_id, name, description) {
+    api.insertLocation(parent_id, name, description);
+  }
+
+  updateLocation(location_id, name, description) {
+    api.updateLocation(location_id, name, description);
+  }
+
+  getMovements(product_id, location_path) {
+    api.getMovements(product_id, location_path);
+  }
+
+  insertMovementEntries(product_id, entries) {
+    api.insertMovementEntries(product_id, entries);
+  }
+
+  updateStateProducts(records) {
     this.setState(() => ({ products: newProducts }));
   }
 
