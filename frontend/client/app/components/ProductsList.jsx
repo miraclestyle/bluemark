@@ -4,33 +4,28 @@ const ProductForm = require('./ProductForm.jsx');
 
 const ProductsList = ({
   products,
-  selectedProduct,
-  modifyProduct,
-  editProduct,
+  selected,
   updateProduct,
-  newProduct,
+  editProduct,
+  saveProduct,
 }) => (
-  <div>
-    <h3>Products</h3>
-    <button onClick={newProduct}>Add New Product</button>
-    <ul>
-      {products.map((product) => (
-        product.id === selectedProduct.id ?
-        <ProductForm
-          key={product.id}
-          selectedProduct={selectedProduct}
-          editProduct={editProduct}
-          updateProduct={updateProduct}
-        />
-        :
-        <ProductRecord
-          product={product}
-          key={product.id}
-          modifyProduct={modifyProduct}
-        />
-      ))}
-    </ul>
-  </div>
+  <ul>
+    {products.map((product) => (
+      product.id === selected.id ?
+      <ProductForm
+        key={product.id}
+        selected={selected}
+        editProduct={editProduct}
+        saveProduct={saveProduct}
+      />
+      :
+      <ProductRecord
+        product={product}
+        key={product.id}
+        updateProduct={updateProduct}
+      />
+    ))}
+  </ul>
 );
 
 module.exports = ProductsList;

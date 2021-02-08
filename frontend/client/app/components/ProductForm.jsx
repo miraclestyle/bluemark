@@ -1,22 +1,22 @@
 const React = require('react');
 
-const ProductForm = ({selectedProduct, editProduct, updateProduct}) => (
+const ProductForm = ({selected, editProduct, saveProduct}) => (
   <li>
     <input
       type="text"
       placeholder="Name"
-      value={selectedProduct.name}
+      value={selected.name}
       name="name"
       onChange={editProduct}
     />
     <input
       type="text"
       placeholder="Description"
-      value={selectedProduct.description}
+      value={selected.description}
       name="description"
       onChange={editProduct}
     />
-    <button onClick={updateProduct}>Save</button>
+    <button onClick={saveProduct}>Save</button>
   </li>
 );
 
