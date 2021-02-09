@@ -1,6 +1,7 @@
 const React = require('react');
 const api = require('../backendAdapter');
 const ProductsList = require('./ProductsList.jsx');
+const Movements = require('../Movements/index.jsx');
 
 class Products extends React.Component {
   constructor(props) {
@@ -8,8 +9,10 @@ class Products extends React.Component {
     this.state = {
       products: [],
       updatedProduct: {id: null, name: '', description: ''},
+      selectedProduct: {id: null, name: '', description: ''},
     };
     this.newProduct = this.newProduct.bind(this);
+    this.selectProduct = this.selectProduct.bind(this);
     this.updateProduct = this.updateProduct.bind(this);
     this.editProduct = this.editProduct.bind(this);
     this.updateProducts = this.updateProducts.bind(this);
@@ -27,6 +30,10 @@ class Products extends React.Component {
       products.push({id: null, name: '', description: ''});
       return { products };
     });
+  }
+
+  selectProduct(product) {
+    this.setState(() => ({ selectedProduct: { ...product } }));
   }
 
   updateProduct(product) {
@@ -77,19 +84,30 @@ class Products extends React.Component {
   }
 
   render() {
-    const { products, updatedProduct } = this.state;
-    const { newProduct, updateProduct, editProduct, saveProduct } = this;
+    const { products, selectedProduct, updatedProduct } = this.state;
+    const {
+      newProduct,
+      updateProduct,
+      editProduct,
+      saveProduct,
+      selectProduct,
+     } = this;
+     let ui = <ProductsList
+        products={products}
+        updatedProduct={updatedProduct}
+        selectProduct={selectProduct}
+        updateProduct={updateProduct}
+        editProduct={editProduct}
+        saveProduct={saveProduct}
+      />;
+     if (selectedProduct.id !== null) {
+       ui = <Movements product_id={selectedProduct.id} />;
+     }
     return (
       <div>
         <h3>Products</h3>
         <button onClick={newProduct}>Add New Product</button>
-        <ProductsList
-          products={products}
-          updatedProduct={updatedProduct}
-          updateProduct={updateProduct}
-          editProduct={editProduct}
-          saveProduct={saveProduct}
-        />
+        { ui }
       </div>
     );
   }
