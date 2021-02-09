@@ -18,18 +18,18 @@ class App extends React.Component {
   render() {
     const { menu } = this.state;
     const { navigate } = this;
-    let item = null;
+    let nav = null;
     if (menu === 'products') {
-      item = <Products />
+      nav = <Products />;
     } else if (menu === 'locations') {
-      item = <Locations />
+      nav = <Locations />;
     }
     return (
       <div>
         <h2>Bluemark Product Movements</h2>
         <button onClick={() => navigate('products')}>Products</button>
         <button onClick={() => navigate('locations')}>Locations</button>
-        { item }
+        { nav }
       </div>
     );
   }

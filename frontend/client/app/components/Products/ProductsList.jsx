@@ -5,6 +5,7 @@ const ProductForm = require('./ProductForm.jsx');
 const ProductsList = ({
   products,
   updatedProduct,
+  selectProduct,
   updateProduct,
   editProduct,
   saveProduct,
@@ -22,6 +23,7 @@ const ProductsList = ({
       <ProductRecord
         product={product}
         key={product.id}
+        selectProduct={selectProduct}
         updateProduct={updateProduct}
       />
     ))}
