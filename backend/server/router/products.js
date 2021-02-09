@@ -4,10 +4,20 @@ const db = require('../database');
 
 const router = express.Router();
 
-const getProducts = (req) => ([req.query.limit, req.query.offset]);
-const getProduct = (req) => ([req.params.id]);
-const insertProduct = (req) => ([req.body.name, req.body.description]);
-const updateProduct = (req) => ([req.params.id, req.body.name, req.body.description]);
+const getProducts = (req) => ([
+  Number(req.query.limit),
+  Number(req.query.offset),
+]);
+const getProduct = (req) => ([Number(req.params.id)]);
+const insertProduct = (req) => ([
+  String(req.body.name),
+  String(req.body.description),
+]);
+const updateProduct = (req) => ([
+  Number(req.params.id),
+  String(req.body.name),
+  String(req.body.description),
+]);
 
 router.get('/api/products', requestHandler(db.getProducts, getProducts));
 router.get('/api/products/:id', requestHandler(db.getProduct, getProduct));
