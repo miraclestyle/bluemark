@@ -6,7 +6,7 @@ class Movements extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      product_id: props.productId,
+      product: props.product,
       newMovement: false,
     };
     this.moveProduct = this.moveProduct.bind(this);
@@ -26,13 +26,13 @@ class Movements extends React.Component {
   }
 
   render() {
-    const { product_id, newMovement } = this.state;
+    const { product, newMovement } = this.state;
     const { moveProduct, closeMovementForm } = this;
     let move_product = null;
     let movment_form = null;
     if (newMovement) {
       movment_form = <MovementForm
-        product_id={product_id}
+        product={product}
         closeMovementForm={closeMovementForm}
       />;
     } else {
@@ -41,6 +41,7 @@ class Movements extends React.Component {
     return (
       <div>
         <h3>Movements</h3>
+        <h5>{product.id} - {product.name} - {product.description}</h5>
         { move_product }
         { movment_form }
       </div>

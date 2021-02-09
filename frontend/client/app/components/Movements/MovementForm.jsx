@@ -6,7 +6,7 @@ class MovementForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      product_id: props.product_id,
+      product: props.product,
       entries: [
         {
           location: {
@@ -66,13 +66,13 @@ class MovementForm extends React.Component {
   }
 
   saveMovement() {
-    const { product_id, entries } = this.state;
+    const { product, entries } = this.state;
     const preparedEntries = entries.map((entry) => ({
       location_path: entry.location.path,
       quantity_in: entry.quantity_in,
       quantity_out: entry.quantity_out,
     }));
-    api.insertMovementEntries(product_id, preparedEntries, (records) => (
+    api.insertMovementEntries(product.id, preparedEntries, (records) => (
       this.props.closeMovementForm()
     ));
   }
