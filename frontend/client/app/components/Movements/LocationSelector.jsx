@@ -14,7 +14,6 @@ const LocationSelector = ({index, location, updateLocation}) => {
   return (
     <select
       name="location"
-      id={`loc-${index}`}
       value={location.id || 'parent'}
       onChange={(e) => {
         updateLocation(e, index);
