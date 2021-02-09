@@ -11,6 +11,17 @@ const getMovements = (product_id, location_path) => {
   return db.query(q);
 };
 
+const getMovement = (product_movement_id) => {
+  const query = `SELECT pm.product_movement_id AS id,
+  pm.product_id AS product_id, pm.created AS created,  FROM `;
+  const q = {
+    name: 'select-movements',
+    text: query,
+    values: [product_id, location_path],
+  };
+  return db.query(q);
+};
+
 const getInventory = (product_id, location_path) => {
   const query = `SELECT SUM(quantity_in) - SUM(quantity_out) AS quantity_total
     FROM product_location_inventory WHERE product_id = $1 AND location_path = $2`;
@@ -59,23 +70,30 @@ const insertEntries = (client, id, entries) => (
   );
 
 const insertMovementEntries = (product_id, entries) => {
-  if (!validateEntries(entries)) {
-    throw new Error('Invalid entries supplied!');
-  }
-  return db.connect().then((client) => {
+  return db.connect().then((client) => (
     client.query('BEGIN')
-      .then((begin) => (insertMovement(client, product_id)))
-      .then((mData) => (insertEntries(client, mData.rows[0].id, entries)))
-      .then((eData) => {
-        client.query('COMMIT');
-        return eData;
+      .then((begin) => {
+        if (!validateEntries(entries)) {
+          throw new Error('Invalid entries supplied!');
+        }
+        return insertMovement(client, product_id);
+      })
+      .then((movementData) => {
+        return insertEntries(client, movementData.rows[0].id, entries)
+          .then((entiresData) => {
+            client.query('COMMIT');
+            const movement = movementData.rows[0];
+            movement.entries = [...entiresData];
+            const data = { rows: [movement] };
+            return data;
+          });
       })
       .catch((error) => {
         client.query('ROLLBACK');
         throw error;
       })
-      .finally((end) => (client.release()));
-  });
+      .finally((end) => (client.release()))
+  ));
 };
 
 module.exports = {
