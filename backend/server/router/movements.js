@@ -19,11 +19,11 @@ const insertMovementEntries = (req) => ([
 
 router.get(
   '/api/movements/:product_id/:location_path',
-  requestHandler(db.getMovements, getMovements
-));
+  requestHandler(db.getMovements, getMovements)
+);
 router.post(
   '/api/movements',
-  requestHandler(db.insertMovementEntries, insertMovementEntries
-));
+  requestHandler(db.insertMovementEntries, insertMovementEntries)
+);
 
 module.exports = router;
