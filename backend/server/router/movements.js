@@ -4,13 +4,16 @@ const db = require('../database');
 
 const router = express.Router();
 
-const getMovements = (req) => ([req.params.product_id, req.params.location_path]);
+const getMovements = (req) => ([
+  Number(req.params.product_id),
+  Number(req.params.location_path),
+]);
 const insertMovementEntries = (req) => ([
-  req.body.product_id,
+  Number(req.body.product_id),
   req.body.entries.map((entry) => ([
-    entry.location_path,
-    entry.quantity_in,
-    entry.quantity_out,
+    String(entry.location_path),
+    Number(entry.quantity_in),
+    Number(entry.quantity_out),
   ])),
 ]);
 
