@@ -52,15 +52,15 @@ class Locations extends React.Component {
     this.setState((state) => {
       const locations = state.locations.slice();
       const { selectedLocation } = state;
-      const createLocation = {
+      const location = {
         id: null,
         parent_id: selectedLocation.id,
         path: '',
         name: '',
         description: '',
       };
-      locations.push(createLocation);
-      return { locations, updatedLocation: createLocation };
+      locations.push(location);
+      return { locations, updatedLocation: location };
     });
   }
 
@@ -87,9 +87,9 @@ class Locations extends React.Component {
     const key = event.target.name;
     const value = event.target.value;
     this.setState((state) => {
-      const newLocation = { ...state.updatedLocation };
-      newLocation[key] = value;
-      return { updatedLocation: newLocation };
+      const location = { ...state.updatedLocation };
+      location[key] = value;
+      return { updatedLocation: location };
     });
   }
 
@@ -158,7 +158,7 @@ class Locations extends React.Component {
         />
         <LocationsList
           locations={locations}
-          selected={updatedLocation}
+          updatedLocation={updatedLocation}
           selectLocation={selectLocation}
           updateLocation={updateLocation}
           editLocation={editLocation}

@@ -7,7 +7,7 @@ class Products extends React.Component {
     super(props);
     this.state = {
       products: [],
-      product: {id: null, name: '', description: ''},
+      updatedProduct: {id: null, name: '', description: ''},
     };
     this.newProduct = this.newProduct.bind(this);
     this.updateProduct = this.updateProduct.bind(this);
@@ -29,17 +29,17 @@ class Products extends React.Component {
     });
   }
 
-  updateProduct(selectedProduct) {
-    this.setState(() => ({ product: { ...selectedProduct } }));
+  updateProduct(product) {
+    this.setState(() => ({ updatedProduct: { ...product } }));
   }
 
   editProduct(event) {
     const key = event.target.name;
     const value = event.target.value;
     this.setState((state) => {
-      const newProduct = { ...state.product };
-      newProduct[key] = value;
-      return { product: newProduct };
+      const product = { ...state.product };
+      product[key] = value;
+      return { updatedProduct: product };
     });
   }
 
@@ -48,7 +48,7 @@ class Products extends React.Component {
       const products = state.products.slice();
       const i = products.findIndex((product) => (product.id === product_id));
       products.splice(i, 1, newProduct);
-      return { products, product: {id: null, name: '', description: ''} };
+      return { products, updatedProduct: {id: null, name: '', description: ''} };
     });
   }
 
@@ -59,25 +59,25 @@ class Products extends React.Component {
   }
 
   saveProduct() {
-    const { product } = this.state;
-    if (product.id !== null) {
+    const { updatedProduct } = this.state;
+    if (updatedProduct.id !== null) {
       api.updateProduct(
-        product.id,
-        product.name,
-        product.description,
-        (records) => (this.updateProducts(product.id, records[0]))
+        updatedProduct.id,
+        updatedProduct.name,
+        updatedProduct.description,
+        (records) => (this.updateProducts(updatedProduct.id, records[0]))
       );
     } else {
       api.insertProduct(
-        product.name,
-        product.description,
+        updatedProduct.name,
+        updatedProduct.description,
         (records) => (this.updateProducts(null, records[0]))
       );
     }
   }
 
   render() {
-    const { products, product } = this.state;
+    const { products, updatedProduct } = this.state;
     const { newProduct, updateProduct, editProduct, saveProduct } = this;
     return (
       <div>
@@ -85,7 +85,7 @@ class Products extends React.Component {
         <button onClick={newProduct}>Add New Product</button>
         <ProductsList
           products={products}
-          selected={product}
+          updatedProduct={updatedProduct}
           updateProduct={updateProduct}
           editProduct={editProduct}
           saveProduct={saveProduct}

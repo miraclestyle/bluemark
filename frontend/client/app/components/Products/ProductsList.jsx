@@ -4,17 +4,17 @@ const ProductForm = require('./ProductForm.jsx');
 
 const ProductsList = ({
   products,
-  selected,
+  updatedProduct,
   updateProduct,
   editProduct,
   saveProduct,
 }) => (
   <ul>
     {products.map((product) => (
-      product.id === selected.id ?
+      product.id === updatedProduct.id ?
       <ProductForm
         key={product.id}
-        selected={selected}
+        product={updatedProduct}
         editProduct={editProduct}
         saveProduct={saveProduct}
       />

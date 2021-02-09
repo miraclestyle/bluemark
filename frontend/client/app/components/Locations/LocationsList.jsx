@@ -4,7 +4,7 @@ const LocationForm = require('./LocationForm.jsx');
 
 const LocationsList = ({
   locations,
-  selected,
+  updatedLocation,
   selectLocation,
   updateLocation,
   editLocation,
@@ -12,10 +12,10 @@ const LocationsList = ({
 }) => (
   <ul>
     {locations.map((location) => (
-      location.id === selected.id ?
+      location.id === updatedLocation.id ?
       <LocationForm
         key={location.id}
-        selected={selected}
+        location={updatedLocation}
         editLocation={editLocation}
         saveLocation={saveLocation}
       />
