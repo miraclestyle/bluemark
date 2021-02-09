@@ -44,7 +44,18 @@ class MovementForm extends React.Component {
   }
 
   componentDidMount() {
+    this.updateLocation(null, 0);
+    this.updateLocation(null, 1);
+  }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { entries } = this.state;
+    const oldEntries = prevState.entries;
+    if (entries.length > oldEntries.length) {
+      for (let i = oldEntries.length; i < entries.length; i += 1) {
+        this.updateLocation(null, i);
+      }
+    }
   }
 
   locationTemplate() {
@@ -72,6 +83,7 @@ class MovementForm extends React.Component {
       const entry = { ...state.entries[index] };
       entry[key] = value;
       entries.splice(index, 1, entry);
+      // console.log(entries);
       return { entries };
     });
   }
@@ -100,8 +112,8 @@ class MovementForm extends React.Component {
   }
 
   updateLocation(event, index) {
-    const location_id = event.target.value;
-    if (location_id === null) {
+    const location_id = event !== null ? event.target.value : null;
+    if (location_id === null || location_id === 'parent') {
       api.getLocations(null, (records) => {
         const newLocation = this.locationTemplate();
         newLocation.children = records.map((record) => (
