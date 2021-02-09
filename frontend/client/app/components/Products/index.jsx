@@ -101,7 +101,7 @@ class Products extends React.Component {
         saveProduct={saveProduct}
       />;
      if (selectedProduct.id !== null) {
-       ui = <Movements product_id={selectedProduct.id} />;
+       ui = <Movements productId={selectedProduct.id} />;
      }
     return (
       <div>

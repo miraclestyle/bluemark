@@ -34,6 +34,8 @@ class MovementForm extends React.Component {
         },
       ],
     };
+    this.cancelMovement = this.cancelMovement.bind(this);
+    this.saveMovement = this.saveMovement.bind(this);
     this.locationTemplate = this.locationTemplate.bind(this);
     this.entryTemplate = this.entryTemplate.bind(this);
     this.updateEntries = this.updateEntries.bind(this);
@@ -41,6 +43,7 @@ class MovementForm extends React.Component {
     this.removeEntry = this.removeEntry.bind(this);
     this.editEntry = this.editEntry.bind(this);
     this.updateLocation = this.updateLocation.bind(this);
+
   }
 
   componentDidMount() {
@@ -56,6 +59,22 @@ class MovementForm extends React.Component {
         this.updateLocation(null, i);
       }
     }
+  }
+
+  cancelMovement() {
+    this.props.closeMovementForm();
+  }
+
+  saveMovement() {
+    const { product_id, entries } = this.state;
+    const preparedEntries = entries.map((entry) => ({
+      location_path: entry.location.path,
+      quantity_in: entry.quantity_in,
+      quantity_out: entry.quantity_out,
+    }));
+    api.insertMovementEntries(product_id, preparedEntries, (records) => (
+      this.props.closeMovementForm()
+    ));
   }
 
   locationTemplate() {
@@ -83,7 +102,6 @@ class MovementForm extends React.Component {
       const entry = { ...state.entries[index] };
       entry[key] = value;
       entries.splice(index, 1, entry);
-      // console.log(entries);
       return { entries };
     });
   }
@@ -108,7 +126,7 @@ class MovementForm extends React.Component {
   editEntry(event, index) {
     const key = event.target.name;
     const value = event.target.value;
-    updateEntries(index, key, value);
+    this.updateEntries(index, key, value);
   }
 
   updateLocation(event, index) {
@@ -137,6 +155,8 @@ class MovementForm extends React.Component {
   render() {
     const { entries } = this.state;
     const {
+      cancelMovement,
+      saveMovement,
       newEntry,
       updateLocation,
       editEntry,
@@ -144,6 +164,8 @@ class MovementForm extends React.Component {
     } = this;
     return (
       <div>
+        <button onClick={cancelMovement}>Cancel</button>
+        <button onClick={saveMovement}>Save</button>
         <button onClick={newEntry}>Add New Entry</button>
         <EntriesList
           entries={entries}
