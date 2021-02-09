@@ -6,6 +6,7 @@ class MovementForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      product_id: props.product_id,
       entries: [
         {
           location: {
@@ -123,11 +124,14 @@ class MovementForm extends React.Component {
 
   render() {
     const { entries } = this.state;
-    const { updateLocation, editEntry, removeEntry } = this;
+    const {
+      newEntry,
+      updateLocation,
+      editEntry,
+      removeEntry,
+    } = this;
     return (
       <div>
-        <h3>Movements</h3>
-        <button onClick={moveProduct}>Move Product</button>
         <button onClick={newEntry}>Add New Entry</button>
         <EntriesList
           entries={entries}
@@ -140,4 +144,4 @@ class MovementForm extends React.Component {
   }
 }
 
-module.exports = Products;
+module.exports = MovementForm;

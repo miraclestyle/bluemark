@@ -3,6 +3,7 @@ const React = require('react');
 const LocationSelector = ({index, location, updateLocation}) => (
     <select
       name="location"
+      id={`loc-${index}`}
       value={location.id || null}
       onChange={(e) => {
         updateLocation(e, index);

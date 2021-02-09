@@ -1,5 +1,5 @@
 const React = require('react');
-const LocationSelector = require('./LocationSelector');
+const LocationSelector = require('./LocationSelector.jsx');
 
 const EntryForm = ({
   index,
