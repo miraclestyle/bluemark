@@ -116,7 +116,6 @@ class Locations extends React.Component {
         this.setState(() => ({ selectedLocation: records[0] }));
       });
     }
-
   }
 
   saveLocation() {
@@ -146,7 +145,6 @@ class Locations extends React.Component {
       updateLocation,
       editLocation,
       saveLocation,
-      getLocations,
     } = this;
     return (
       <div>

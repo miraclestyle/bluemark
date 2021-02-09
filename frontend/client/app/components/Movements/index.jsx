@@ -1,6 +1,7 @@
 const React = require('react');
 const api = require('../backendAdapter');
 const MovementForm = require('./MovementForm.jsx');
+const MovementStats = require('./MovementStats.jsx');
 
 class Movements extends React.Component {
   constructor(props) {
@@ -11,10 +12,6 @@ class Movements extends React.Component {
     };
     this.moveProduct = this.moveProduct.bind(this);
     this.closeMovementForm = this.closeMovementForm.bind(this);
-  }
-
-  componentDidMount() {
-
   }
 
   moveProduct() {
@@ -44,6 +41,7 @@ class Movements extends React.Component {
         <h5>{product.id} - {product.name} - {product.description}</h5>
         { move_product }
         { movment_form }
+        <MovementStats product={product} />
       </div>
     );
   }

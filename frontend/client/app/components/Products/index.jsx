@@ -44,7 +44,7 @@ class Products extends React.Component {
     const key = event.target.name;
     const value = event.target.value;
     this.setState((state) => {
-      const product = { ...state.product };
+      const product = { ...state.updatedProduct };
       product[key] = value;
       return { updatedProduct: product };
     });
@@ -100,13 +100,15 @@ class Products extends React.Component {
         editProduct={editProduct}
         saveProduct={saveProduct}
       />;
+    let new_product = <button onClick={newProduct}>Add New Product</button>;
      if (selectedProduct.id !== null) {
        ui = <Movements product={selectedProduct} />;
+       new_product = null;
      }
     return (
       <div>
         <h3>Products</h3>
-        <button onClick={newProduct}>Add New Product</button>
+        { new_product }
         { ui }
       </div>
     );
