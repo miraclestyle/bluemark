@@ -14,8 +14,6 @@ class MovementStats extends React.Component {
     this.locationTemplate = this.locationTemplate.bind(this);
     this.selectLocation = this.selectLocation.bind(this);
     this.getLocations = this.getLocations.bind(this);
-    this.getLocation = this.getLocation.bind(this);
-    this.getMovements = this.getMovements.bind(this);
   }
 
   componentDidMount() {
