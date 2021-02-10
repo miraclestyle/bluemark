@@ -50,7 +50,7 @@ const updateLocation = (locationId, name, description, callback) => {
 };
 
 const getInventory = (productId, locationId, callback) => {
-  const uri = `${BACKEND_ENDPOINT}${MOVEMENTS}/${productId}`;
+  let uri = `${BACKEND_ENDPOINT}${MOVEMENTS}/${productId}`;
   if (locationId !== null) uri = `${uri}/${locationId}`;
   axios.get(uri)
     .then((response) => (callback(response.data.rows)))

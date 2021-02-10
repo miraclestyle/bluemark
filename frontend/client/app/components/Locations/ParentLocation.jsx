@@ -1,13 +1,13 @@
 const React = require('react');
 
-const ParentLocation = ({ location, selectLocation }) => (
+const ParentLocation = ({ index, location, selectLocation }) => (
   <div>
     <h4>Parent Location</h4>
     <div>
       {location.path}&nbsp;|&nbsp;
       {location.name}&nbsp;|&nbsp;
       {location.description}&nbsp;|&nbsp;
-      <button onClick={() => selectLocation(location.parent_id)}>Up</button>
+      <button onClick={() => selectLocation(index, location.parent_id)}>Up</button>
     </div>
   </div>
 );

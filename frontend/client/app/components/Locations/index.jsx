@@ -8,8 +8,8 @@ class Locations extends React.Component {
     super(props);
     this.state = {
       locations: [],
-      selectedLocation: this.locationTemplate(),
-      updatedLocation: this.locationTemplate(),
+      selectedLocation: -1,
+      updatedLocation: -1,
     };
     this.locationTemplate = this.locationTemplate.bind(this);
     this.newLocation = this.newLocation.bind(this);
@@ -17,13 +17,12 @@ class Locations extends React.Component {
     this.updateLocation = this.updateLocation.bind(this);
     this.editLocation = this.editLocation.bind(this);
     this.updateLocations = this.updateLocations.bind(this);
-    this.getLocations = this.getLocations.bind(this);
     this.cancelLocation = this.cancelLocation.bind(this);
     this.saveLocation = this.saveLocation.bind(this);
   }
 
   componentDidMount() {
-    this.getLocations();
+    this.selectLocation();
   }
 
   locationTemplate() {
@@ -43,25 +42,22 @@ class Locations extends React.Component {
       const location = this.locationTemplate();
       location.parent_id = selectedLocation.id;
       locations.push(location);
-      return { locations, updatedLocation: location };
+      return { locations, updatedLocation: locations.length - 1 };
     });
   }
 
-  selectLocation(locationId) {
-    this.getLocations(locationId);
+  updateLocation(index) {
+    this.setState({ updatedLocation: index });
   }
 
-  updateLocation(location) {
-    this.setState({ updatedLocation: { ...location } });
-  }
-
-  editLocation(event) {
-    const key = event.target.name;
-    const value = event.target.value;
+  editLocation(key, value, index) {
+    console.log(key, value, index);
     this.setState((state) => {
-      const location = { ...state.updatedLocation };
+      const locations = [ ...state.locations ];
+      const location = { ...locations[index] };
       location[key] = value;
-      return { updatedLocation: location };
+      locations[index] = location;
+      return { locations, updatedLocation: index };
     });
   }
 
@@ -71,31 +67,43 @@ class Locations extends React.Component {
       const i = locations.findIndex((location) => (location.id === locationId));
       if (i === -1) locations.push(newLocation);
       else locations.splice(i, 1, newLocation);
-      return { locations, updatedLocation: this.locationTemplate() };
+      return { locations, updatedLocation: -1 };
     });
   }
 
-  getLocations(locationId = null) {
-    api.getLocations(locationId, (records) => {
+  selectLocation(index = null, parentId = undefined) {
+    console.log(index, parentId);
+    let id = index === null ? null : this.state.locations[index].id;
+    if (parentId !== undefined) id = parentId;
+    api.getLocations(id, (locations) => {
       this.setState({
-        locations: locationId === null ? records : records.slice(1),
-        selectedLocation: locationId === null ? this.locationTemplate() : records[0],
-        updatedLocation: this.locationTemplate(),
+        locations,
+        selectedLocation: id === null ? -1 : 0,
+        updatedLocation: -1,
       });
     });
   }
 
-  cancelLocation() {
-    this.setState({ updatedLocation: this.locationTemplate() });
+  cancelLocation(index) {
+    this.setState((state) => {
+      const { id } = state.locations[index];
+      if (id === null) {
+        const locations = [ ...state.locations ];
+        locations.splice(index, 1);
+        return { locations, updatedLocation: -1 };
+      } else {
+        return { updatedLocation: -1 };
+      }
+    });
   }
 
-  saveLocation() {
+  saveLocation(index) {
     const {
       id,
       parent_id,
       name,
       description,
-    } = this.state.updatedLocation;
+    } = this.state.locations[index];
     const callback = (records) => {
       if (id !== null) this.updateLocations(id, records[0])
       else this.updateLocations(null, records[0])
@@ -117,16 +125,22 @@ class Locations extends React.Component {
       cancelLocation,
       saveLocation,
     } = this;
+    let parentLocation = null;
+    if (selectedLocation > -1) {
+      parentLocation = <ParentLocation
+        index={selectedLocation}
+        location={locations[selectedLocation]}
+        selectLocation={selectLocation}
+      />
+    }
     return (
       <div>
         <h3>Locations</h3>
         <button onClick={newLocation}>Add New Location</button>
-        <ParentLocation
-          location={selectedLocation}
-          selectLocation={selectLocation}
-        />
+        {parentLocation}
         <LocationsList
           locations={locations}
+          selectedLocation={selectedLocation}
           updatedLocation={updatedLocation}
           selectLocation={selectLocation}
           updateLocation={updateLocation}
