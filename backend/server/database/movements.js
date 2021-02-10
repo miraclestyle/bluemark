@@ -25,7 +25,6 @@ const getRelatedInventory = (prefix, productId, locationId) => {
 };
 
 const getInventory = (productId, locationId = null) => {
-  const path = locationPath.length > 0 ? `${locationPath}.*{1}` : '*{1}';
   const prefix = `
   SELECT
   location_id,
