@@ -8,6 +8,7 @@ const LocationsList = ({
   selectLocation,
   updateLocation,
   editLocation,
+  cancelLocation,
   saveLocation,
 }) => (
   <ul>
@@ -17,6 +18,7 @@ const LocationsList = ({
         key={location.id}
         location={updatedLocation}
         editLocation={editLocation}
+        cancelLocation={cancelLocation}
         saveLocation={saveLocation}
       />
       :

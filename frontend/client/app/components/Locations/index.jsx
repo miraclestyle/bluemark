@@ -8,29 +8,17 @@ class Locations extends React.Component {
     super(props);
     this.state = {
       locations: [],
-      selectedLocation: {
-        id: null,
-        parent_id: null,
-        path: '',
-        name: '',
-        description: '',
-      },
-      updatedLocation: {
-        id: null,
-        parent_id: null,
-        path: '',
-        name: '',
-        description: '',
-      },
+      selectedLocation: this.locationTemplate(),
+      updatedLocation: this.locationTemplate(),
     };
-    this.template = this.template.bind(this);
+    this.locationTemplate = this.locationTemplate.bind(this);
     this.newLocation = this.newLocation.bind(this);
     this.selectLocation = this.selectLocation.bind(this);
     this.updateLocation = this.updateLocation.bind(this);
     this.editLocation = this.editLocation.bind(this);
     this.updateLocations = this.updateLocations.bind(this);
     this.getLocations = this.getLocations.bind(this);
-    this.getLocation = this.getLocation.bind(this);
+    this.cancelLocation = this.cancelLocation.bind(this);
     this.saveLocation = this.saveLocation.bind(this);
   }
 
@@ -38,7 +26,7 @@ class Locations extends React.Component {
     this.getLocations();
   }
 
-  template() {
+  locationTemplate() {
     return {
       id: null,
       parent_id: null,
@@ -50,37 +38,21 @@ class Locations extends React.Component {
 
   newLocation() {
     this.setState((state) => {
-      const locations = state.locations.slice();
+      const locations = [ ...state.locations ];
       const { selectedLocation } = state;
-      const location = {
-        id: null,
-        parent_id: selectedLocation.id,
-        path: '',
-        name: '',
-        description: '',
-      };
+      const location = this.locationTemplate();
+      location.parent_id = selectedLocation.id;
       locations.push(location);
       return { locations, updatedLocation: location };
     });
   }
 
-  selectLocation(location) {
-    if (location === null) {
-      const { selectedLocation } = this.state;
-      this.getLocations(selectedLocation.parent_id);
-      this.getLocation(selectedLocation.parent_id);
-      this.setState(() => ({ updatedLocation: this.template() }));
-    } else {
-      this.getLocations(location.id);
-      this.setState(() => ({
-        selectedLocation: location,
-        updatedLocation: this.template(),
-      }));
-    }
+  selectLocation(locationId) {
+    this.getLocations(locationId);
   }
 
   updateLocation(location) {
-    this.setState(() => ({ updatedLocation: { ...location } }));
+    this.setState({ updatedLocation: { ...location } });
   }
 
   editLocation(event) {
@@ -93,47 +65,45 @@ class Locations extends React.Component {
     });
   }
 
-  updateLocations(location_id, newLocation) {
+  updateLocations(locationId, newLocation) {
     this.setState((state) => {
-      const locations = state.locations.slice();
-      const i = locations.findIndex((location) => (location.id === location_id));
-      locations.splice(i, 1, newLocation);
-      return { locations, updatedLocation: this.template() };
+      const locations = [ ...state.locations ];
+      const i = locations.findIndex((location) => (location.id === locationId));
+      if (i === -1) locations.push(newLocation);
+      else locations.splice(i, 1, newLocation);
+      return { locations, updatedLocation: this.locationTemplate() };
     });
   }
 
-  getLocations(parent_id = null) {
-    api.getLocations(parent_id, (records) => {
-      this.setState(() => ({ locations: records }));
-    });
-  }
-
-  getLocation(location_id) {
-    if (location_id === null) {
-      this.setState(() => ({ selectedLocation: this.template() }));
-    } else {
-      api.getLocation(location_id, (records) => {
-        this.setState(() => ({ selectedLocation: records[0] }));
+  getLocations(locationId = null) {
+    api.getLocations(locationId, (records) => {
+      this.setState({
+        locations: locationId === null ? records : records.slice(1),
+        selectedLocation: locationId === null ? this.locationTemplate() : records[0],
+        updatedLocation: this.locationTemplate(),
       });
-    }
+    });
+  }
+
+  cancelLocation() {
+    this.setState({ updatedLocation: this.locationTemplate() });
   }
 
   saveLocation() {
-    const { updatedLocation } = this.state;
-    if (updatedLocation.id !== null) {
-      api.updateLocation(
-        updatedLocation.id,
-        updatedLocation.name,
-        updatedLocation.description,
-        (records) => (this.updateLocations(updatedLocation.id, records[0]))
-      );
+    const {
+      id,
+      parent_id,
+      name,
+      description,
+    } = this.state.updatedLocation;
+    const callback = (records) => {
+      if (id !== null) this.updateLocations(id, records[0])
+      else this.updateLocations(null, records[0])
+    };
+    if (id !== null) {
+      api.updateLocation(id, name, description, callback);
     } else {
-      api.insertLocation(
-        updatedLocation.parent_id,
-        updatedLocation.name,
-        updatedLocation.description,
-        (records) => (this.updateLocations(null, records[0]))
-      );
+      api.insertLocation(parent_id, name, description, callback);
     }
   }
 
@@ -144,6 +114,7 @@ class Locations extends React.Component {
       selectLocation,
       updateLocation,
       editLocation,
+      cancelLocation,
       saveLocation,
     } = this;
     return (
@@ -160,6 +131,7 @@ class Locations extends React.Component {
           selectLocation={selectLocation}
           updateLocation={updateLocation}
           editLocation={editLocation}
+          cancelLocation={cancelLocation}
           saveLocation={saveLocation}
         />
       </div>
