@@ -74,19 +74,14 @@ class Products extends React.Component {
 
   saveProduct() {
     const { id, name, description } = this.state.updatedProduct;
+    const callback = (records) => {
+      if (id !== null) this.updateProducts(id, records[0]);
+      else this.updateProducts(null, records[0]);
+    };
     if (id !== null) {
-      api.updateProduct(
-        id,
-        name,
-        description,
-        (records) => (this.updateProducts(id, records[0]))
-      );
+      api.updateProduct(id, name, description, callback);
     } else {
-      api.insertProduct(
-        name,
-        description,
-        (records) => (this.updateProducts(null, records[0]))
-      );
+      api.insertProduct(name, description, callback);
     }
   }
 
