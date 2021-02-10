@@ -5,12 +5,12 @@ const db = require('../database');
 const router = express.Router();
 
 const getLocations = (req) => ([
-  req.query.parent_id,
+  req.query.parent_id === undefined ? null : Number(req.query.parent_id),
 ]);
 const getLocation = (req) => ([Number(req.params.id)]);
 const insertLocation = (req) => ([
   String(req.body.name),
-  Number(req.body.parent_id),
+  req.body.parent_id === null ? null : Number(req.body.parent_id),
   String(req.body.description),
 ]);
 const updateLocation = (req) => ([
@@ -19,9 +19,21 @@ const updateLocation = (req) => ([
   String(req.body.description),
 ]);
 
-router.get('/api/locations', requestHandler(db.getLocations, getLocations));
-router.get('/api/locations/:id', requestHandler(db.getLocation, getLocation));
-router.post('/api/locations', requestHandler(db.insertLocation, insertLocation));
-router.post('/api/locations/:id', requestHandler(db.updateLocation, updateLocation));
+router.get(
+  '/api/locations',
+  requestHandler(db.getLocations, getLocations)
+);
+router.get(
+  '/api/locations/:id',
+  requestHandler(db.getLocation, getLocation)
+);
+router.post(
+  '/api/locations',
+  requestHandler(db.insertLocation, insertLocation)
+);
+router.post(
+  '/api/locations/:id',
+  requestHandler(db.updateLocation, updateLocation)
+);
 
 module.exports = router;

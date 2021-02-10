@@ -1,11 +1,9 @@
 const db = require('./client');
 
-const getRootLocations = () => {
-  const query = `SELECT location_id AS id, location_parent_id AS parent_id,
-    location_path AS path, location_name AS name,
-    location_description AS description
-    FROM locations
-    WHERE location_parent_id IS NULL`;
+const getRootLocations = (prefix) => {
+  const sufix = `WHERE location_parent_id IS NULL
+    ORDER BY location_path ASC`;
+  const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-root-locations',
     text: query,
@@ -13,12 +11,10 @@ const getRootLocations = () => {
   return db.query(q);
 };
 
-const getChildLocations = (parent_id) => {
-  const query = `SELECT location_id AS id, location_parent_id AS parent_id,
-    location_path AS path, location_name AS name,
-    location_description AS description
-    FROM locations
-    WHERE location_parent_id = $1`;
+const getChildLocations = (prefix, parent_id) => {
+  const sufix = `WHERE location_parent_id = $1
+    ORDER BY location_path ASC`;
+  const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-child-locations',
     text: query,
@@ -27,15 +23,25 @@ const getChildLocations = (parent_id) => {
   return db.query(q);
 };
 
-const getLocations = (parent_id = null) => (
-  parent_id === null ? getRootLocations() : getChildLocations(parent_id)
-  );
-
-const getLocation = (id) => {
-  const query = `SELECT location_id AS id, location_parent_id AS parent_id,
+const getLocations = (parent_id = null) => {
+  const prefix = `SELECT
+    location_id AS id, location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description
-    FROM locations WHERE location_id = $1`;
+    FROM locations`;
+  if (parent_id === null) {
+    return getRootLocations(prefix);
+  }
+  return getChildLocations(prefix, parent_id);
+};
+
+const getLocation = (id) => {
+  const query = `SELECT
+    location_id AS id, location_parent_id AS parent_id,
+    location_path AS path, location_name AS name,
+    location_description AS description
+    FROM locations
+    WHERE location_id = $1`;
   const q = {
     name: 'select-location',
     text: query,
@@ -48,7 +54,8 @@ const insertLocation = (name, parent_id, description) => {
   const query = `INSERT INTO locations
     (location_name, location_parent_id, location_description)
     VALUES ($1, $2, $3)
-    RETURNING location_id AS id,
+    RETURNING
+    location_id AS id,
     location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description`;
@@ -61,9 +68,11 @@ const insertLocation = (name, parent_id, description) => {
 };
 
 const updateLocation = (id, name, description) => {
-  const query = `UPDATE locations SET location_name = $2, location_description = $3
+  const query = `UPDATE locations
+    SET location_name = $2, location_description = $3
     WHERE location_id = $1
-    RETURNING location_id AS id,
+    RETURNING
+    location_id AS id,
     location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description`;
