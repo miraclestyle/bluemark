@@ -9,8 +9,8 @@ class Products extends React.Component {
     super(props);
     this.state = {
       products: [],
-      selectedProduct: this.productTemplate(),
-      updatedProduct: this.productTemplate(),
+      selectedProduct: -1,
+      updatedProduct: -1,
     };
     this.productTemplate = this.productTemplate.bind(this);
     this.newProduct = this.newProduct.bind(this);
@@ -33,25 +33,31 @@ class Products extends React.Component {
 
   newProduct() {
     this.setState((state) => {
-      return { products: [ ...state.products, this.productTemplate() ] };
+      const products = [ ...state.products, this.productTemplate() ];
+      return { products, updatedProduct: products.length - 1 };
     });
   }
 
-  selectProduct(product) {
-    this.setState({ selectedProduct: { ...product } });
+  selectProduct(index) {
+    const { id } = this.state.products[index];
+    if (id === null) this.setState({
+      selectedProduct: -1,
+      updatedProduct: -1,
+    });
+    else this.setState({ selectedProduct: index, updatedProduct: -1 });
   }
 
-  updateProduct(product) {
-    this.setState({ updatedProduct: { ...product } });
+  updateProduct(index) {
+    this.setState({ updatedProduct: index });
   }
 
-  editProduct(event) {
-    const key = event.target.name;
-    const value = event.target.value;
+  editProduct(key, value, index) {
     this.setState((state) => {
-      const product = { ...state.updatedProduct };
+      const products = [ ...state.products ];
+      const product = { ...products[index] };
       product[key] = value;
-      return { updatedProduct: product };
+      products[index] = product;
+      return { products, updatedProduct: index };
     });
   }
 
@@ -68,12 +74,21 @@ class Products extends React.Component {
     api.getProducts(1000, 0, (products) => (this.setState({ products })));
   }
 
-  cancelProduct() {
-    this.setState({ updatedProduct: this.productTemplate() });
+  cancelProduct(index) {
+    this.setState((state) => {
+      const { id } = state.products[index];
+      if (id === null) {
+        const products = [ ...state.products ];
+        products.splice(index, 1);
+        return { products, updatedProduct: -1 };
+      } else {
+        return { updatedProduct: -1 };
+      }
+    });
   }
 
-  saveProduct() {
-    const { id, name, description } = this.state.updatedProduct;
+  saveProduct(index) {
+    const { id, name, description } = this.state.products[index];
     const callback = (records) => {
       if (id !== null) this.updateProducts(id, records[0]);
       else this.updateProducts(null, records[0]);
@@ -94,25 +109,30 @@ class Products extends React.Component {
       saveProduct,
       cancelProduct,
       selectProduct,
-     } = this;
-     let addNewProduct = <button onClick={newProduct}>Add New Product</button>;
-     let ui = <ProductsList
-        products={products}
-        updatedProduct={updatedProduct}
-        selectProduct={selectProduct}
-        updateProduct={updateProduct}
-        editProduct={editProduct}
-        cancelProduct={cancelProduct}
-        saveProduct={saveProduct}
-      />;
-     if (selectedProduct.id !== null) {
-       ui = <Movements product={selectedProduct} />;
-       addNewProduct = null;
-     }
+    } = this;
+    let selected = null;
+    let addNewProduct = <button onClick={newProduct}>
+      Add New Product
+    </button>;
+    let ui = <ProductsList
+      products={products}
+      updatedProduct={updatedProduct}
+      selectedProduct={selectedProduct}
+      selectProduct={selectProduct}
+      updateProduct={updateProduct}
+      editProduct={editProduct}
+      cancelProduct={cancelProduct}
+      saveProduct={saveProduct}
+    />;
+    if (selectedProduct > -1) {
+      selected = <SelectedProduct product={products[selectedProduct]} />;
+      ui = <Movements product={products[selectedProduct]} />;
+      addNewProduct = null;
+    }
     return (
       <div>
         <h3>Products</h3>
-        <SelectedProduct product={selectedProduct} />
+        {selected}
         {addNewProduct}
         {ui}
       </div>
