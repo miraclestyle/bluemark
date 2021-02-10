@@ -1,5 +1,5 @@
 const React = require('react');
-const api = require('../backendAdapter');
+const api = require('../../backendAdapter');
 const ProductsList = require('./ProductsList.jsx');
 const Movements = require('../Movements/index.jsx');
 

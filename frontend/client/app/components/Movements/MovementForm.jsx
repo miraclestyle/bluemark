@@ -1,5 +1,5 @@
 const React = require('react');
-const api = require('../backendAdapter');
+const api = require('../../backendAdapter');
 const EntriesList = require('./EntriesList.jsx');
 
 class MovementForm extends React.Component {

@@ -1,5 +1,5 @@
 const React = require('react');
-const api = require('../backendAdapter');
+const api = require('../../backendAdapter');
 const MovementForm = require('./MovementForm.jsx');
 const MovementStats = require('./MovementStats.jsx');
 
