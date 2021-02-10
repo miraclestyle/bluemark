@@ -8,7 +8,7 @@ const EntriesList = ({
   removeEntry,
 }) => (
   <ul>
-    <li>Location - Qunatity In - Qunatity Out</li>
+    <li>Location | Qunatity In | Qunatity Out</li>
     {entries.map((entry, index) => (
       <EntryForm
         key={index}
