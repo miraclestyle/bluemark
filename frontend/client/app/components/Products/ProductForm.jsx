@@ -1,6 +1,7 @@
 const React = require('react');
 
 const ProductForm = ({
+  index,
   product,
   editProduct,
   cancelProduct,
@@ -12,17 +13,17 @@ const ProductForm = ({
       placeholder="Name"
       value={product.name}
       name="name"
-      onChange={editProduct}
+      onChange={(e) => editProduct(e.target.name, e.target.value, index)}
     />
     <input
       type="text"
       placeholder="Description"
       value={product.description}
       name="description"
-      onChange={editProduct}
+      onChange={(e) => editProduct(e.target.name, e.target.value, index)}
     />
-    <button onClick={cancelProduct}>Cancel</button>
-    <button onClick={saveProduct}>Save</button>
+    <button onClick={() => cancelProduct(index)}>Cancel</button>
+    <button onClick={() => saveProduct(index)}>Save</button>
   </li>
 );
 

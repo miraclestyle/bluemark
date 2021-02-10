@@ -13,11 +13,10 @@ class MovementStats extends React.Component {
     };
     this.locationTemplate = this.locationTemplate.bind(this);
     this.selectLocation = this.selectLocation.bind(this);
-    this.getLocations = this.getLocations.bind(this);
   }
 
   componentDidMount() {
-    this.getLocations();
+    this.selectLocation();
   }
 
   locationTemplate() {
@@ -30,11 +29,7 @@ class MovementStats extends React.Component {
     };
   }
 
-  selectLocation(locationId) {
-    this.getLocations(locationId);
-  }
-
-  getLocations(locationId = null) {
+  selectLocation(locationId = null) {
     const { product } = this.state;
     api.getInventory(product.id, locationId, (records) => {
       this.setState({

@@ -5,6 +5,7 @@ const ProductForm = require('./ProductForm.jsx');
 const ProductsList = ({
   products,
   updatedProduct,
+  selectedProduct,
   selectProduct,
   updateProduct,
   editProduct,
@@ -12,18 +13,21 @@ const ProductsList = ({
   saveProduct,
 }) => (
   <ul>
-    {products.map((product) => (
-      product.id === updatedProduct.id ?
+    {products.map((product, index) => (
+      index === selectedProduct ? null :
+      index === updatedProduct ?
       <ProductForm
-        key={product.id}
-        product={updatedProduct}
+        key={index}
+        index={index}
+        product={product}
         editProduct={editProduct}
         cancelProduct={cancelProduct}
         saveProduct={saveProduct}
       />
       :
       <ProductRecord
-        key={product.id}
+        key={index}
+        index={index}
         product={product}
         selectProduct={selectProduct}
         updateProduct={updateProduct}

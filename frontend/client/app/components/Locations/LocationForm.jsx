@@ -1,6 +1,7 @@
 const React = require('react');
 
 const LocationForm = ({
+  index,
   location,
   editLocation,
   cancelLocation,
@@ -12,17 +13,17 @@ const LocationForm = ({
       placeholder="Name"
       value={location.name}
       name="name"
-      onChange={editLocation}
+      onChange={(e) => editLocation(e.target.name, e.target.value, index)}
     />
     <input
       type="text"
       placeholder="Description"
       value={location.description}
       name="description"
-      onChange={editLocation}
+      onChange={(e) => editLocation(e.target.name, e.target.value, index)}
     />
-    <button onClick={cancelLocation}>Cancel</button>
-    <button onClick={saveLocation}>Save</button>
+    <button onClick={() => cancelLocation(index)}>Cancel</button>
+    <button onClick={() => saveLocation(index)}>Save</button>
   </li>
 );
 

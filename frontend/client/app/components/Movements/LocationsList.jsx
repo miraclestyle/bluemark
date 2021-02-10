@@ -5,8 +5,8 @@ const LocationsList = ({ locations, selectLocation }) => (
   <ul>
     {locations.map((location) => (
       <LocationRecord
+        key={location.location_id}
         location={location}
-        key={location.id}
         selectLocation={selectLocation}
       />
     ))}
