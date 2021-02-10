@@ -1,8 +1,32 @@
 const db = require('./client');
 
-const getInventory = (productId, locationPath) => {
+const getRootInventory = (prefix, productId) => {
+  const sufix = `AND location_parent_id IS NULL
+    ORDER BY location_path`;
+  const query = `${prefix} ${sufix}`;
+  const q = {
+    name: 'select-root-inventory',
+    text: query,
+    values: [productId],
+  };
+  return db.query(q);
+};
+
+const getRelatedInventory = (prefix, productId, locationId) => {
+  const sufix = `AND (location_id = $2 OR location_parent_id = $2)
+    ORDER BY location_path`;
+  const query = `${prefix} ${sufix}`;
+  const q = {
+    name: 'select-related-inventory',
+    text: query,
+    values: [productId, locationId],
+  };
+  return db.query(q);
+};
+
+const getInventory = (productId, locationId = null) => {
   const path = locationPath.length > 0 ? `${locationPath}.*{1}` : '*{1}';
-  const query = `
+  const prefix = `
   SELECT
   location_id,
   location_parent_id AS parent_id,
@@ -13,14 +37,9 @@ const getInventory = (productId, locationPath) => {
   quantity_out,
   quantity_total
   FROM product_location_inventory
-  WHERE product_id = $1 AND location_path ~ $2
-  ORDER BY location_path`;
-  const q = {
-    name: 'select-inventory',
-    text: query,
-    values: [productId, path],
-  };
-  return db.query(q);
+  WHERE product_id = $1`;
+  if (locationId === null) return getRootInventory(prefix, productId);
+  return getRelatedInventory(prefix, productId, locationId);
 };
 
 const validateEntries = (entries, keyIn = 1, keyOut = 2) => (

@@ -33,21 +33,6 @@ const getLocations = (parentId = null) => {
   return getRelatedLocations(prefix, parentId);
 };
 
-const getLocation = (id) => {
-  const query = `SELECT
-    location_id AS id, location_parent_id AS parent_id,
-    location_path AS path, location_name AS name,
-    location_description AS description
-    FROM locations
-    WHERE location_id = $1`;
-  const q = {
-    name: 'select-location',
-    text: query,
-    values: [id],
-  };
-  return db.query(q);
-};
-
 const insertLocation = (name, parentId, description) => {
   const query = `INSERT INTO locations
     (location_name, location_parent_id, location_description)

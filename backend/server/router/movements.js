@@ -6,7 +6,7 @@ const router = express.Router();
 
 const getInventory = (req) => ([
   Number(req.params.productId),
-  String(req.params.locationPath || ''),
+  req.params.locationId === undefined ? null : Number(req.params.locationId),
 ]);
 const insertMovementEntries = (req) => ([
   Number(req.body.productId),
@@ -18,7 +18,7 @@ const insertMovementEntries = (req) => ([
 ]);
 
 router.get(
-  '/api/movements/:product_id/:location_path?',
+  '/api/movements/:productId/:locationId?',
   requestHandler(db.getInventory, getInventory)
 );
 router.post(
