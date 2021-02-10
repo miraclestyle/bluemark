@@ -35,13 +35,6 @@ const getLocations = (parentId, callback) => {
     .catch((error) => (console.log('getLocations error:', error)));
 };
 
-const getLocation = (locationId, callback) => {
-  const uri = `${BACKEND_ENDPOINT}${LOCATIONS}/${locationId}`;
-  axios.get(uri)
-    .then((response) => (callback(response.data.rows)))
-    .catch((error) => (console.log('getLocation error:', error)));
-};
-
 const insertLocation = (parentId, name, description, callback) => {
   const uri = `${BACKEND_ENDPOINT}${LOCATIONS}`;
   axios.post(uri, { parentId, name, description })
@@ -56,8 +49,9 @@ const updateLocation = (locationId, name, description, callback) => {
     .catch((error) => (console.log('updateLocation error:', error)));
 };
 
-const getMovements = (productId, locationPath, callback) => {
-  const uri = `${BACKEND_ENDPOINT}${MOVEMENTS}/${productId}/${locationPath}`;
+const getInventory = (productId, locationId, callback) => {
+  const uri = `${BACKEND_ENDPOINT}${MOVEMENTS}/${productId}`;
+  if (locationId !== null) uri = `${uri}/${locationId}`;
   axios.get(uri)
     .then((response) => (callback(response.data.rows)))
     .catch((error) => (console.log('getMovements error:', error)));
@@ -75,9 +69,8 @@ module.exports = {
   insertProduct,
   updateProduct,
   getLocations,
-  getLocation,
   insertLocation,
   updateLocation,
-  getMovements,
+  getInventory,
   insertMovementEntries,
 };

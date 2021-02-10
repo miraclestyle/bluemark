@@ -6,7 +6,7 @@ const ParentLocation = ({ location, selectLocation }) => (
     <div>
       {location.path}&nbsp;|&nbsp;
       {location.name}&nbsp;|&nbsp;
-      <button onClick={() => selectLocation(null)}>Up</button>
+      <button onClick={() => selectLocation(location.parent_id)}>Up</button>
     </div>
   </div>
 );
