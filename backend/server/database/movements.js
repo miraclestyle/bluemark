@@ -1,85 +1,99 @@
 const db = require('./client');
 
-const getMovements = (product_id, location_path) => {
-  const path = location_path.length > 0 ? `${location_path}.*{1}` : '*{1}';
-  const query = `
-  SELECT
-  l.location_path AS path,
-  l.location_name AS name,
-  SUM(pli.quantity_in) AS qty_in,
-  SUM(pli.quantity_out) AS qty_out,
-  SUM(pli.quantity_in) - SUM(pli.quantity_out) AS qty_total
-  FROM locations AS l INNER JOIN product_location_inventory AS pli
-  ON (pli.location_path <@ l.location_path)
-  WHERE pli.product_id = $1 AND l.location_path ~ $2
-  GROUP BY l.location_path, l.location_name`;
+const getRootInventory = (prefix, productId) => {
+  const sufix = `AND location_parent_id IS NULL
+    ORDER BY location_path`;
+  const query = `${prefix} ${sufix}`;
   const q = {
-    name: 'select-movements',
+    name: 'select-root-inventory',
     text: query,
-    values: [product_id, path],
+    values: [productId],
   };
   return db.query(q);
 };
 
-const validateEntries = (entries, key_in = 1, key_out = 2) => (
+const getRelatedInventory = (prefix, productId, locationId) => {
+  const sufix = `AND (location_id = $2 OR location_parent_id = $2)
+    ORDER BY location_path`;
+  const query = `${prefix} ${sufix}`;
+  const q = {
+    name: 'select-related-inventory',
+    text: query,
+    values: [productId, locationId],
+  };
+  return db.query(q);
+};
+
+const getInventory = (productId, locationId = null) => {
+  const prefix = `
+  SELECT
+  location_id,
+  location_parent_id AS parent_id,
+  location_path AS path,
+  location_name AS name,
+  product_id,
+  quantity_in,
+  quantity_out,
+  quantity_total
+  FROM product_location_inventory
+  WHERE product_id = $1`;
+  if (locationId === null) return getRootInventory(prefix, productId);
+  return getRelatedInventory(prefix, productId, locationId);
+};
+
+const validateEntries = (entries, keyIn = 1, keyOut = 2) => (
   new Promise((resolve, reject) => {
     if (entries.length < 2) {
       reject(new Error('Invalid entries supplied!'));
       return;
     }
-    const quantities_in = entries.map((entry) => (entry[key_in]));
-    const quantitities_out = entries.map((entry) => (entry[key_out]));
-    const sum = (acumulator, value) => (acumulator + Number(value));
-    console.log(key_in, key_out);
-    console.log(quantities_in, quantitities_out);
-    if (quantities_in.reduce(sum, 0) !== quantitities_out.reduce(sum, 0)) {
+    const totalIn = entries.reduce((acm, val) => (acm + Number(val[keyIn])), 0);
+    const totalOut = entries.reduce((acm, val) => (acm + Number(val[keyOut])), 0);
+    if (totalIn !== totalOut) {
       reject(new Error('Invalid entries supplied!'));
       return;
     }
-    resolve('Entries valid.');
+    resolve('Supplied entries are valid.');
   })
 );
 
-const getMovement = (client, product_movement_id) => {
+const getMovement = (client, productMovementId) => {
   const query = `SELECT
-    pm.product_movement_id AS id,
-    pm.product_id AS product_id, pm.created AS created,
-    pme.location_path AS location_path,
-    pme.quantity_out AS quantity_out,
-    pme.quantity_in AS quantity_in
-    FROM product_movements AS pm
-    INNER JOIN product_movement_entries AS pme
-    ON (pm.product_movement_id = pme.product_movement_id)
-    WHERE pm.product_movement_id = $1`;
+    product_movement_id AS id,
+    quantity_in,
+    quantity_out
+    FROM product_location_movements
+    WHERE product_movement_id = $1`;
   const q = {
     name: 'select-movement',
     text: query,
-    values: [product_movement_id],
+    values: [productMovementId],
   };
   return client.query(q);
 };
 
-const insertMovement = (client, product_id) => {
-  const query = `INSERT INTO product_movements (product_id)
+const insertMovement = (client, productId) => {
+  const query = `INSERT INTO product_movements
+    (product_id)
     VALUES ($1)
-    RETURNING product_movement_id AS id`;
+    RETURNING
+    product_movement_id AS id`;
   const q = {
     name: 'insert-movement',
     text: query,
-    values: [product_id],
+    values: [productId],
   };
   return client.query(q);
 };
 
-const insertEntry = (client, id, path, qty_in = 0, qty_out = 0) => {
+const insertEntry = (client, id, path, qtyIn = 0, qtyOut = 0) => {
   const query = `INSERT INTO product_movement_entries
     (product_movement_id, location_path, quantity_in, quantity_out)
-    VALUES ($1, $2, $3, $4)
-    RETURNING product_movement_entry_id AS id`;
+    VALUES ($1, $2, $3, $4)`;
   const q = {
     name: 'insert-entry',
     text: query,
-    values: [id, path, qty_in, qty_out],
+    values: [id, path, qtyIn, qtyOut],
   };
   return client.query(q);
 };
@@ -88,24 +102,20 @@ const insertEntries = (client, id, entries) => (
   Promise.all(entries.map((entry) => (insertEntry(client, id, ...entry))))
   );
 
-const insertMovementEntries = (product_id, entries) => (
+const insertMovementEntries = (productId, entries) => (
   validateEntries(entries)
     .then(() => (
       db.connect().then((client) => (
         client.query('BEGIN')
-          .then((begin) => (insertMovement(client, product_id)))
+          .then((begin) => (insertMovement(client, productId)))
           .then((movement) => {
             return insertEntries(client, movement.rows[0].id, entries)
-              .then((entiresData) => (getMovement(client, movement.rows[0].id)))
-              .then((data) => {
+              .then((response) => (getMovement(client, movement.rows[0].id)))
+              .then((data) => (
                 validateEntries(data.rows, 'quantity_in', 'quantity_out')
-                  .then(() => (client.query('COMMIT')))
-                  .catch((error) => {
-                    throw error;
-                  });
-                return data;
-              });
+              ));
           })
+          .then(() => (client.query('COMMIT')))
           .catch((error) => {
             client.query('ROLLBACK');
             throw error;
@@ -116,6 +126,6 @@ const insertMovementEntries = (product_id, entries) => (
 );
 
 module.exports = {
-  getMovements,
+  getInventory,
   insertMovementEntries,
  };

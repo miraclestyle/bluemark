@@ -1,5 +1,5 @@
 const React = require('react');
-const api = require('../backendAdapter');
+const api = require('../../backendAdapter');
 const EntriesList = require('./EntriesList.jsx');
 
 class MovementForm extends React.Component {
@@ -7,80 +7,28 @@ class MovementForm extends React.Component {
     super(props);
     this.state = {
       product: props.product,
-      entries: [
-        {
-          location: {
-            id: null,
-            parent_id: null,
-            path: '',
-            name: '',
-            description: '',
-            children: [],
-          },
-          quantity_in: 0,
-          quantity_out: 0,
-        },
-        {
-          location: {
-            id: null,
-            parent_id: null,
-            path: '',
-            name: '',
-            description: '',
-            children: [],
-          },
-          quantity_in: 0,
-          quantity_out: 0,
-        },
-      ],
+      entries: [],
     };
-    this.cancelMovement = this.cancelMovement.bind(this);
-    this.saveMovement = this.saveMovement.bind(this);
     this.locationTemplate = this.locationTemplate.bind(this);
     this.entryTemplate = this.entryTemplate.bind(this);
+    this.cancelMovement = this.cancelMovement.bind(this);
+    this.saveMovement = this.saveMovement.bind(this);
     this.updateEntries = this.updateEntries.bind(this);
     this.newEntry = this.newEntry.bind(this);
     this.removeEntry = this.removeEntry.bind(this);
     this.editEntry = this.editEntry.bind(this);
     this.updateLocation = this.updateLocation.bind(this);
-
   }
 
   componentDidMount() {
-    this.updateLocation(null, 0);
-    this.updateLocation(null, 1);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { entries } = this.state;
-    const oldEntries = prevState.entries;
-    if (entries.length > oldEntries.length) {
-      for (let i = oldEntries.length; i < entries.length; i += 1) {
-        this.updateLocation(null, i);
-      }
-    }
-  }
-
-  cancelMovement() {
-    this.props.closeMovementForm();
-  }
-
-  saveMovement() {
-    const { product, entries } = this.state;
-    const preparedEntries = entries.map((entry) => ({
-      location_path: entry.location.path,
-      quantity_in: entry.quantity_in,
-      quantity_out: entry.quantity_out,
-    }));
-    api.insertMovementEntries(product.id, preparedEntries, (records) => (
-      this.props.closeMovementForm()
-    ));
+    this.newEntry();
+    this.newEntry();
   }
 
   locationTemplate() {
     return {
-      id: null,
-      parent_id: null,
+      id: 'none',
+      parent_id: 'none',
       path: '',
       name: '',
       description: '',
@@ -96,9 +44,25 @@ class MovementForm extends React.Component {
     };
   }
 
+  cancelMovement() {
+    this.props.cancelMovement();
+  }
+
+  saveMovement() {
+    const { product, entries } = this.state;
+    const preparedEntries = entries.map((entry) => ({
+      locationPath: entry.location.path,
+      quantityIn: entry.quantity_in,
+      quantityOut: entry.quantity_out,
+    }));
+    api.insertMovementEntries(product.id, preparedEntries, (records) => (
+      this.cancelMovement()
+    ));
+  }
+
   updateEntries(index, key, value) {
     this.setState((state) => {
-      const entries = state.entries.slice();
+      const entries = [ ...state.entries ];
       const entry = { ...state.entries[index] };
       entry[key] = value;
       entries.splice(index, 1, entry);
@@ -107,17 +71,23 @@ class MovementForm extends React.Component {
   }
 
   newEntry() {
-    const entry = this.entryTemplate();
-    this.setState((state) => {
-      const entries = state.entries.slice();
-      entries.push(entry);
-      return { entries };
+    api.getLocations(null, (records) => {
+      this.setState((state) => {
+        const entry = this.entryTemplate();
+        const location = this.locationTemplate();
+        const children = records;
+        location.children = children.map((child) => ({ ...child, children: [] }));
+        entry.location = location
+        const entries = [ ...state.entries ];
+        entries.push(entry);
+        return { entries };
+      });
     });
   }
 
   removeEntry(index) {
     this.setState((state) => {
-      const entries = state.entries.slice();
+      const entries = [ ...state.entries ];
       entries.splice(index, 1);
       return { entries };
     });
@@ -130,26 +100,20 @@ class MovementForm extends React.Component {
   }
 
   updateLocation(event, index) {
-    const location_id = event !== null ? event.target.value : null;
-    if (location_id === null || location_id === 'parent') {
-      api.getLocations(null, (records) => {
-        const newLocation = this.locationTemplate();
-        newLocation.children = records.map((record) => (
-          { ...record, children: [] }
-        ));
-        this.updateEntries(index, 'location', newLocation);
-      });
-    } else {
-      api.getLocation(location_id, (ancestors) => {
-        const newLocation = ancestors[0];
-        api.getLocations(newLocation.id, (descendants) => {
-          newLocation.children = descendants.map((child) => (
-            { ...child, children: [] }
-          ));
-          this.updateEntries(index, 'location', newLocation);
-        });
-      });
+    let locationId = null;
+    if (event !==  null && event.target.value !== 'none') {
+      locationId = event.target.value;
     }
+    api.getLocations(locationId, (records) => {
+      let location = this.locationTemplate();
+      let children = records;
+      if (locationId !== null) {
+        location = records[0];
+        children = records.slice(1);
+      }
+      location.children = children.map((child) => ({ ...child, children: [] }));
+      this.updateEntries(index, 'location', location);
+    });
   }
 
   render() {

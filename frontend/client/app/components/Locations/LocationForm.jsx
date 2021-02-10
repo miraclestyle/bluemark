@@ -1,6 +1,11 @@
 const React = require('react');
 
-const LocationForm = ({location, editLocation, saveLocation}) => (
+const LocationForm = ({
+  location,
+  editLocation,
+  cancelLocation,
+  saveLocation
+}) => (
   <li>
     <input
       type="text"
@@ -16,6 +21,7 @@ const LocationForm = ({location, editLocation, saveLocation}) => (
       name="description"
       onChange={editLocation}
     />
+    <button onClick={cancelLocation}>Cancel</button>
     <button onClick={saveLocation}>Save</button>
   </li>
 );
