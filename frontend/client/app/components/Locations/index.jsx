@@ -51,7 +51,6 @@ class Locations extends React.Component {
   }
 
   editLocation(key, value, index) {
-    console.log(key, value, index);
     this.setState((state) => {
       const locations = [ ...state.locations ];
       const location = { ...locations[index] };
@@ -72,7 +71,6 @@ class Locations extends React.Component {
   }
 
   selectLocation(index = null, parentId = undefined) {
-    console.log(index, parentId);
     let id = index === null ? null : this.state.locations[index].id;
     if (parentId !== undefined) id = parentId;
     api.getLocations(id, (locations) => {
