@@ -11,28 +11,28 @@ const getRootLocations = (prefix) => {
   return db.query(q);
 };
 
-const getChildLocations = (prefix, parent_id) => {
+const getChildLocations = (prefix, parentId) => {
   const sufix = `WHERE location_parent_id = $1
     ORDER BY location_path ASC`;
   const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-child-locations',
     text: query,
-    values: [parent_id],
+    values: [parentId],
   };
   return db.query(q);
 };
 
-const getLocations = (parent_id = null) => {
+const getLocations = (parentId = null) => {
   const prefix = `SELECT
     location_id AS id, location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description
     FROM locations`;
-  if (parent_id === null) {
+  if (parentId === null) {
     return getRootLocations(prefix);
   }
-  return getChildLocations(prefix, parent_id);
+  return getChildLocations(prefix, parentId);
 };
 
 const getLocation = (id) => {
@@ -50,7 +50,7 @@ const getLocation = (id) => {
   return db.query(q);
 };
 
-const insertLocation = (name, parent_id, description) => {
+const insertLocation = (name, parentId, description) => {
   const query = `INSERT INTO locations
     (location_name, location_parent_id, location_description)
     VALUES ($1, $2, $3)
@@ -62,7 +62,7 @@ const insertLocation = (name, parent_id, description) => {
   const q = {
     name: 'insert-location',
     text: query,
-    values: [name, parent_id, description],
+    values: [name, parentId, description],
   };
   return db.query(q);
 };

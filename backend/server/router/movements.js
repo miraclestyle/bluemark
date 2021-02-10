@@ -4,22 +4,22 @@ const db = require('../database');
 
 const router = express.Router();
 
-const getMovements = (req) => ([
-  Number(req.params.product_id),
-  String(req.params.location_path || ''),
+const getInventory = (req) => ([
+  Number(req.params.productId),
+  String(req.params.locationPath || ''),
 ]);
 const insertMovementEntries = (req) => ([
-  Number(req.body.product_id),
+  Number(req.body.productId),
   req.body.entries.map((entry) => ([
-    String(entry.location_path),
-    Number(entry.quantity_in),
-    Number(entry.quantity_out),
+    String(entry.locationPath),
+    Number(entry.quantityIn),
+    Number(entry.quantityOut),
   ])),
 ]);
 
 router.get(
   '/api/movements/:product_id/:location_path?',
-  requestHandler(db.getMovements, getMovements)
+  requestHandler(db.getInventory, getInventory)
 );
 router.post(
   '/api/movements',

@@ -62,6 +62,7 @@ CREATE TABLE product_movements (
 );
 
 CREATE INDEX product_movement_product_ids ON product_movements (product_id);
+CREATE INDEX product_movement_creations ON product_movements (created);
 
 
 DROP TABLE IF EXISTS product_movement_entries;
@@ -78,12 +79,35 @@ CREATE INDEX product_movement_entry_product_movement_ids ON product_movement_ent
 CREATE INDEX product_movement_entry_location_paths ON product_movement_entries USING GIST (location_path);
 
 
+DROP VIEW IF EXISTS product_location_movements;
+
+CREATE VIEW product_location_movements AS SELECT
+pm.product_movement_id AS product_movement_id,
+pm.product_id AS product_id,
+pm.created AS created,
+pme.location_path AS location_path,
+pme.quantity_in AS quantity_in,
+pme.quantity_out AS quantity_out
+FROM product_movements AS pm INNER JOIN product_movement_entries AS pme
+ON (pm.product_movement_id = pme.product_movement_id);
+
+
 DROP VIEW IF EXISTS product_location_inventory;
 
 CREATE VIEW product_location_inventory AS SELECT
+l.location_id AS location_id,
+l.location_parent_id AS location_parent_id,
+l.location_path AS location_path,
+l.location_name AS location_name,
 pm.product_id AS product_id,
-pme.location_path AS location_path,
-(CASE WHEN pme.quantity_out IS NULL THEN 0 ELSE pme.quantity_out END) AS quantity_out,
-(CASE WHEN pme.quantity_in IS NULL THEN 0 ELSE pme.quantity_in END) AS quantity_in
-FROM product_movements AS pm INNER JOIN product_movement_entries AS pme
-ON (pm.product_movement_id = pme.product_movement_id);
+SUM(pme.quantity_in) AS quantity_in,
+SUM(pme.quantity_out) AS quantity_out,
+SUM(pme.quantity_in) - SUM(pme.quantity_out) AS quantity_total
+FROM locations AS l
+INNER JOIN
+product_movement_entries AS pme
+ON (pme.location_path <@ l.location_path)
+INNER JOIN
+product_movements AS pm
+ON (pm.product_movement_id = pme.product_movement_id)
+GROUP BY l.location_id, l.location_parent_id, l.location_path, l.location_name, pm.product_id;
