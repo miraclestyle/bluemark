@@ -164,6 +164,7 @@ class MovementForm extends React.Component {
     } = this;
     return (
       <div>
+        <h5>New Movement</h5>
         <button onClick={cancelMovement}>Cancel</button>
         <button onClick={saveMovement}>Save</button>
         <button onClick={newEntry}>Add New Entry</button>
