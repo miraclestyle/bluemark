@@ -8,6 +8,7 @@ const ProductsList = ({
   selectProduct,
   updateProduct,
   editProduct,
+  cancelProduct,
   saveProduct,
 }) => (
   <ul>
@@ -17,12 +18,13 @@ const ProductsList = ({
         key={product.id}
         product={updatedProduct}
         editProduct={editProduct}
+        cancelProduct={cancelProduct}
         saveProduct={saveProduct}
       />
       :
       <ProductRecord
-        product={product}
         key={product.id}
+        product={product}
         selectProduct={selectProduct}
         updateProduct={updateProduct}
       />

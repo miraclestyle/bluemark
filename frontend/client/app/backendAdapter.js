@@ -4,7 +4,7 @@ const {
   PRODUCTS,
   LOCATIONS,
   MOVEMENTS,
-} = require('../../config');
+} = require('../config');
 
 const getProducts = (limit, offset, callback) => {
   const uri = `${BACKEND_ENDPOINT}${PRODUCTS}?limit=${limit}&offset=${offset}`;

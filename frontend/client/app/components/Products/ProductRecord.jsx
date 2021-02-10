@@ -1,8 +1,11 @@
 const React = require('react');
 
-const ProductRecord = ({product, selectProduct, updateProduct}) => (
+const ProductRecord = ({ product, selectProduct, updateProduct }) => (
   <li>
-    {product.name} - {product.description} - <button onClick={(event) => selectProduct(product)}>Select</button> - <button onClick={(event) => updateProduct(product)}>Update</button>
+    {product.name}&nbsp;|&nbsp;
+    {product.description}&nbsp;|&nbsp;
+    <button onClick={(event) => selectProduct(product)}>Select</button>&nbsp;|&nbsp;
+    <button onClick={(event) => updateProduct(product)}>Update</button>
   </li>
 );
 

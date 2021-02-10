@@ -1,5 +1,6 @@
 const React = require('react');
 const api = require('../../backendAdapter');
+const SelectedProduct = require('./SelectedProduct.jsx');
 const ProductsList = require('./ProductsList.jsx');
 const Movements = require('../Movements/index.jsx');
 
@@ -8,15 +9,17 @@ class Products extends React.Component {
     super(props);
     this.state = {
       products: [],
-      updatedProduct: {id: null, name: '', description: ''},
-      selectedProduct: {id: null, name: '', description: ''},
+      selectedProduct: this.productTemplate(),
+      updatedProduct: this.productTemplate(),
     };
+    this.productTemplate = this.productTemplate.bind(this);
     this.newProduct = this.newProduct.bind(this);
     this.selectProduct = this.selectProduct.bind(this);
     this.updateProduct = this.updateProduct.bind(this);
     this.editProduct = this.editProduct.bind(this);
     this.updateProducts = this.updateProducts.bind(this);
     this.getProducts = this.getProducts.bind(this);
+    this.cancelProduct = this.cancelProduct.bind(this);
     this.saveProduct = this.saveProduct.bind(this);
   }
 
@@ -24,20 +27,22 @@ class Products extends React.Component {
     this.getProducts();
   }
 
+  productTemplate() {
+    return {id: null, name: '', description: ''};
+  }
+
   newProduct() {
     this.setState((state) => {
-      const products = state.products.slice();
-      products.push({id: null, name: '', description: ''});
-      return { products };
+      return { products: [ ...state.products, this.productTemplate() ] };
     });
   }
 
   selectProduct(product) {
-    this.setState(() => ({ selectedProduct: { ...product } }));
+    this.setState({ selectedProduct: { ...product } });
   }
 
   updateProduct(product) {
-    this.setState(() => ({ updatedProduct: { ...product } }));
+    this.setState({ updatedProduct: { ...product } });
   }
 
   editProduct(event) {
@@ -50,34 +55,36 @@ class Products extends React.Component {
     });
   }
 
-  updateProducts(product_id, newProduct) {
+  updateProducts(productId, newProduct) {
     this.setState((state) => {
-      const products = state.products.slice();
-      const i = products.findIndex((product) => (product.id === product_id));
+      const products = [ ...state.products ];
+      const i = products.findIndex((product) => (product.id === productId));
       products.splice(i, 1, newProduct);
-      return { products, updatedProduct: {id: null, name: '', description: ''} };
+      return { products, updatedProduct: this.productTemplate() };
     });
   }
 
   getProducts() {
-    api.getProducts(1000, 0, (records) => {
-      this.setState(() => ({ products: records }));
-    });
+    api.getProducts(1000, 0, (products) => (this.setState({ products })));
+  }
+
+  cancelProduct() {
+    this.setState({ updatedProduct: this.productTemplate() });
   }
 
   saveProduct() {
-    const { updatedProduct } = this.state;
-    if (updatedProduct.id !== null) {
+    const { id, name, description } = this.state.updatedProduct;
+    if (id !== null) {
       api.updateProduct(
-        updatedProduct.id,
-        updatedProduct.name,
-        updatedProduct.description,
-        (records) => (this.updateProducts(updatedProduct.id, records[0]))
+        id,
+        name,
+        description,
+        (records) => (this.updateProducts(id, records[0]))
       );
     } else {
       api.insertProduct(
-        updatedProduct.name,
-        updatedProduct.description,
+        name,
+        description,
         (records) => (this.updateProducts(null, records[0]))
       );
     }
@@ -90,27 +97,29 @@ class Products extends React.Component {
       updateProduct,
       editProduct,
       saveProduct,
+      cancelProduct,
       selectProduct,
      } = this;
+     let addNewProduct = <button onClick={newProduct}>Add New Product</button>;
      let ui = <ProductsList
         products={products}
         updatedProduct={updatedProduct}
         selectProduct={selectProduct}
         updateProduct={updateProduct}
         editProduct={editProduct}
+        cancelProduct={cancelProduct}
         saveProduct={saveProduct}
       />;
-    let new_product = <button onClick={newProduct}>Add New Product</button>;
      if (selectedProduct.id !== null) {
        ui = <Movements product={selectedProduct} />;
-       new_product = null;
+       addNewProduct = null;
      }
     return (
       <div>
         <h3>Products</h3>
-        <h4>{selectedProduct.id} - {selectedProduct.name} - {selectedProduct.description}</h4>
-        { new_product }
-        { ui }
+        <SelectedProduct product={selectedProduct} />
+        {addNewProduct}
+        {ui}
       </div>
     );
   }
