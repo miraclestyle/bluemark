@@ -1,24 +1,22 @@
 const db = require('./client');
 
 const getMovements = (product_id, location_path) => {
-  const query = `SELECT product_id, location_path, quantity_in, quantity_out
-    FROM product_location_inventory WHERE product_id = $1 AND location_path <@ $2`;
+  const path = location_path.length > 0 ? `${location_path}.*{1}` : '*{1}';
+  const query = `
+  SELECT
+  l.location_path AS path,
+  l.location_name AS name,
+  SUM(pli.quantity_in) AS qty_in,
+  SUM(pli.quantity_out) AS qty_out,
+  SUM(pli.quantity_in) - SUM(pli.quantity_out) AS qty_total
+  FROM locations AS l INNER JOIN product_location_inventory AS pli
+  ON (pli.location_path <@ l.location_path)
+  WHERE pli.product_id = $1 AND l.location_path ~ $2
+  GROUP BY l.location_path, l.location_name`;
   const q = {
     name: 'select-movements',
     text: query,
-    values: [product_id, location_path],
-  };
-  return db.query(q);
-};
-
-const getInventory = (product_id, location_path) => {
-  const query = `SELECT SUM(quantity_in) - SUM(quantity_out) AS quantity_total
-    FROM product_location_inventory
-    WHERE product_id = $1 AND location_path = $2`;
-  const q = {
-    name: 'select-inventory',
-    text: query,
-    values: [product_id, location_path],
+    values: [product_id, path],
   };
   return db.query(q);
 };
@@ -48,8 +46,9 @@ const getMovement = (client, product_movement_id) => {
     pm.product_id AS product_id, pm.created AS created,
     pme.location_path AS location_path,
     pme.quantity_out AS quantity_out,
-    pme.quantity_in AS quantity_in FROM
-    product_movements AS pm INNER JOIN product_movement_entries AS pme
+    pme.quantity_in AS quantity_in
+    FROM product_movements AS pm
+    INNER JOIN product_movement_entries AS pme
     ON (pm.product_movement_id = pme.product_movement_id)
     WHERE pm.product_movement_id = $1`;
   const q = {
@@ -61,7 +60,8 @@ const getMovement = (client, product_movement_id) => {
 };
 
 const insertMovement = (client, product_id) => {
-  const query = `INSERT INTO product_movements (product_id) VALUES ($1)
+  const query = `INSERT INTO product_movements (product_id)
+    VALUES ($1)
     RETURNING product_movement_id AS id`;
   const q = {
     name: 'insert-movement',
@@ -117,6 +117,5 @@ const insertMovementEntries = (product_id, entries) => (
 
 module.exports = {
   getMovements,
-  getInventory,
   insertMovementEntries,
  };

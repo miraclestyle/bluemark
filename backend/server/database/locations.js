@@ -4,7 +4,8 @@ const getRootLocations = () => {
   const query = `SELECT location_id AS id, location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description
-    FROM locations WHERE location_parent_id IS NULL`;
+    FROM locations
+    WHERE location_parent_id IS NULL`;
   const q = {
     name: 'select-root-locations',
     text: query,
@@ -16,7 +17,8 @@ const getChildLocations = (parent_id) => {
   const query = `SELECT location_id AS id, location_parent_id AS parent_id,
     location_path AS path, location_name AS name,
     location_description AS description
-    FROM locations WHERE location_parent_id = $1`;
+    FROM locations
+    WHERE location_parent_id = $1`;
   const q = {
     name: 'select-child-locations',
     text: query,

@@ -108,6 +108,7 @@ class Products extends React.Component {
     return (
       <div>
         <h3>Products</h3>
+        <h4>{selectedProduct.id} - {selectedProduct.name} - {selectedProduct.description}</h4>
         { new_product }
         { ui }
       </div>

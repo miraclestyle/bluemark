@@ -37,8 +37,7 @@ class Movements extends React.Component {
     }
     return (
       <div>
-        <h3>Movements</h3>
-        <h5>{product.id} - {product.name} - {product.description}</h5>
+        <h4>Movements</h4>
         { move_product }
         { movment_form }
         <MovementStats product={product} />

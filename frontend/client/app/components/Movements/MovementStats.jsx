@@ -21,10 +21,23 @@ class MovementStats extends React.Component {
     this.selectLocation = this.selectLocation.bind(this);
     this.getLocations = this.getLocations.bind(this);
     this.getLocation = this.getLocation.bind(this);
+    this.getMovements = this.getMovements.bind(this);
   }
 
   componentDidMount() {
     this.getLocations();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const newLocation = this.state.selectedLocation;
+    const oldLocation = prevState.selectedLocation;
+    const newLength = this.state.locations.length;
+    const oldLength = prevState.locations.length;
+    const location = newLocation.id !== oldLocation.id;
+    const lengths = (oldLength === 0 && newLength !== oldLength);
+    if (location || lengths) {
+      this.getMovements();
+    }
   }
 
   template() {
@@ -64,12 +77,28 @@ class MovementStats extends React.Component {
     }
   }
 
+  getMovements() {
+    const { product } = this.state;
+    const { selectedLocation } = this.state;
+    const { path } = selectedLocation;
+    api.getMovements(product.id, path, (records) => {
+      const inventory = {};
+      records.map((record) => { inventory[record.path] = record; });
+      const { locations } = this.state;
+      const newLocations = locations.map((location) => {
+        const item = inventory[location.path] || {};
+        return { ...location, ...item };
+      });
+      this.setState(() => ({ locations: newLocations }));
+    });
+  }
+
   render() {
     const { locations, selectedLocation } = this.state;
     const { selectLocation } = this;
     return (
       <div>
-        <h3>Movement Stats</h3>
+        <h4>Movement Stats</h4>
         <ParentLocation
           location={selectedLocation}
           selectLocation={selectLocation}
