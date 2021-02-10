@@ -2,7 +2,7 @@ const db = require('./client');
 
 const getRootInventory = (prefix, productId) => {
   const sufix = `AND location_parent_id IS NULL
-    ORDER BY location_name`;
+    ORDER BY location_path`;
   const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-root-inventory',
@@ -14,7 +14,7 @@ const getRootInventory = (prefix, productId) => {
 
 const getRelatedInventory = (prefix, productId, locationId) => {
   const sufix = `AND (location_id = $2 OR location_parent_id = $2)
-    ORDER BY location_name`;
+    ORDER BY location_path`;
   const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-related-inventory',

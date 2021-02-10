@@ -2,7 +2,7 @@ const db = require('./client');
 
 const getRootLocations = (prefix) => {
   const sufix = `WHERE location_parent_id IS NULL
-    ORDER BY location_name ASC`;
+    ORDER BY location_path ASC`;
   const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-root-locations',
@@ -13,7 +13,7 @@ const getRootLocations = (prefix) => {
 
 const getRelatedLocations = (prefix, parentId) => {
   const sufix = `WHERE location_id = $1 OR location_parent_id = $1
-    ORDER BY location_name ASC`;
+    ORDER BY location_path ASC`;
   const query = `${prefix} ${sufix}`;
   const q = {
     name: 'select-child-locations',
@@ -25,7 +25,8 @@ const getRelatedLocations = (prefix, parentId) => {
 
 const getLocations = (parentId = null) => {
   const prefix = `SELECT
-    location_id AS id, location_parent_id AS parent_id,
+    location_id AS id,
+    location_parent_id AS parent_id,
     location_path AS path,
     location_name AS name,
     location_description AS description
